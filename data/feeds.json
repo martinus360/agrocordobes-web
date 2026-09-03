@@ -1,0 +1,9 @@
+{
+  "_instrucciones": "Estos son feeds de Google News filtrados por tema + Córdoba/campo. Google News agrega notas de varios portales (Infocampo, Bichos de Campo, La Voz, etc.) sin bloquear pedidos automáticos, y cada nota linkea al portal original real. 'categoria' es la que se usa si Google News no la especifica. Ojo: las URLs de acá son un punto de partida, probalas en el navegador antes de lanzar (ver README).",
+  "fuentes": [
+    { "nombre": "Google News - Clima y economía del campo Córdoba", "rss": "https://news.google.com/rss/search?q=(clima%20OR%20pron%C3%B3stico%20OR%20paritaria%20OR%20d%C3%B3lar)%20campo%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Info Campo" },
+    { "nombre": "Google News - Infraestructura y política agropecuaria Córdoba", "rss": "https://news.google.com/rss/search?q=(caminos%20rurales%20OR%20obras%20OR%20pol%C3%ADtica%20agropecuaria%20OR%20provincia)%20campo%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Agro Verdad" },
+    { "nombre": "Google News - Granos y mercados Córdoba", "rss": "https://news.google.com/rss/search?q=(soja%20OR%20ma%C3%ADz%20OR%20trigo%20OR%20cosecha%20OR%20siembra%20OR%20hacienda)%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Todo Agro" },
+    { "nombre": "Google News - Agro Córdoba general", "rss": "https://news.google.com/rss/search?q=agro%20OR%20agropecuario%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Todo Agro" }
+  ]
+}

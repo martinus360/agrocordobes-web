@@ -1,0 +1,4 @@
+{
+  "_instrucciones": "Poné 1 o 2 banners publicitarios. Si hay 2, rotan solos cada 8 segundos (empezando en uno al azar, no siempre en el primero). Cambiá esto una vez por mes, nada más. Si la imagen está en Drive, el link tiene que tener el formato https://drive.google.com/uc?export=view&id=ID_DEL_ARCHIVO (no el link de 'Compartir' normal) — mejor todavía, subí la imagen directo a assets/ del repo, Drive puede bloquear la carga embebida igual con ese formato en algunos casos. Nota: este archivo se llama 'cabecera.json' a propósito, no 'banner.json' - los bloqueadores de publicidad del navegador bloquean automáticamente cualquier archivo/clase/id que tenga la palabra 'banner' en el nombre.",
+  "elementos": []
+}
