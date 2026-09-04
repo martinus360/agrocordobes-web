@@ -83,6 +83,22 @@ function limpiarHtml(raw) {
   return raw.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 }
 
+// Google News (y a veces microlink al pasar por su página intermedia) no
+// entrega la foto real de la nota, sino un ícono genérico propio de Google
+// (siempre el mismo, aloja en googleusercontent.com/gstatic.com). Si
+// dejáramos pasar esa imagen, se mostraría el logo de Google en vez de algo
+// relacionado con la nota. Mejor tratarla como "sin imagen": así el sitio
+// usa el logo de Agro Cordobés de respaldo (ver imgOFallback en index.html).
+function esImagenGenerica(url) {
+  if (!url) return true;
+  try {
+    const host = new URL(url).hostname;
+    return /(^|\.)googleusercontent\.com$/.test(host) || /(^|\.)gstatic\.com$/.test(host) || /(^|\.)google\.com$/.test(host);
+  } catch {
+    return true;
+  }
+}
+
 function parsearItem(itemXml, nombreFuente, categoriaPorDefecto) {
   let titulo = extraerTag(itemXml, "title") || "Sin título";
   const categoriaRss = extraerTag(itemXml, "category");
@@ -130,7 +146,7 @@ function parsearItem(itemXml, nombreFuente, categoriaPorDefecto) {
     categoria,
     bajada,
     fecha: isNaN(fecha) ? new Date().toISOString() : fecha.toISOString(),
-    imagen: imagen || null,
+    imagen: esImagenGenerica(imagen) ? null : imagen,
   };
 }
 
@@ -169,7 +185,8 @@ async function buscarImagenDeArticulo(url) {
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(12000) });
     if (!res.ok) return null; // incluye el caso de 429 (límite diario gratis agotado)
     const data = await res.json();
-    return data?.data?.image?.url || null;
+    const url = data?.data?.image?.url || null;
+    return esImagenGenerica(url) ? null : url;
   } catch {
     return null; // si falla, la nota queda sin imagen y usa el placeholder, no rompe nada
   }
@@ -206,6 +223,13 @@ async function main() {
   );
 
   const nuevoHistorial = todas.slice(0, MAX_HISTORIAL);
+
+  // Notas viejas que hayan quedado con el ícono genérico de Google (de
+  // corridas anteriores, antes de este chequeo) también se limpian, para
+  // que abajo se les vuelva a intentar buscar una imagen real.
+  for (const nota of nuevoHistorial) {
+    if (esImagenGenerica(nota.imagen)) nota.imagen = null;
+  }
 
   // A las notas que quedaron sin imagen, les vamos a buscar la foto de
   // portada real de la nota.
