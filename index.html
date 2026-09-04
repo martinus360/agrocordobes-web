@@ -187,6 +187,9 @@
     padding: 6px 12px;
     font-size: 11px;
     color: var(--gris-texto);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .estado { text-align: center; padding: 40px 20px; color: var(--gris-texto); font-size: 14px; grid-column: 1 / -1; }
@@ -308,7 +311,7 @@ function tarjeta(n) {
         ${n.bajada ? `<p class="card-excerpt">${n.bajada}</p>` : ""}
         <span class="card-leer">LEER NOTA »</span>
       </div>
-      <div class="card-fecha">${formatearFecha(n.fecha)}</div>
+      <div class="card-fecha">${n.fuente ? n.fuente + " · " : ""}${formatearFecha(n.fecha)}</div>
     </a>`;
 }
 
