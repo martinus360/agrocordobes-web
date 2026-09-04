@@ -66,6 +66,7 @@
   .top-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 330px;
+    align-items: start;
     gap: 12px;
     margin-bottom: 12px;
   }
@@ -249,11 +250,11 @@
           "symbolActiveColor": "rgba(62, 145, 66, 0.12)",
           "tabs": [
             {
-              "title": "Granos (Chicago)",
+              "title": "Granos (referencia)",
               "symbols": [
-                { "s": "CBOT:ZS1!", "d": "Soja" },
-                { "s": "CBOT:ZC1!", "d": "Maíz" },
-                { "s": "CBOT:ZW1!", "d": "Trigo" }
+                { "s": "AMEX:SOYB", "d": "Soja" },
+                { "s": "AMEX:CORN", "d": "Maíz" },
+                { "s": "AMEX:WEAT", "d": "Trigo" }
               ],
               "originalTitle": "Granos"
             }
@@ -326,7 +327,14 @@ function pintarNotas() {
   }
 
   const primeras = todas.slice(0, 2);
-  const resto = todas.slice(2);
+  // La grilla de abajo tiene 3 columnas: si sobra 1 o 2 notas sueltas al
+  // final, queda una fila incompleta y se ve vacía. Mejor recortarlas y
+  // que siempre termine en una fila completa.
+  const restoSinRecortar = todas.slice(2);
+  const resto = restoSinRecortar.slice(
+    0,
+    restoSinRecortar.length - (restoSinRecortar.length % 3)
+  );
 
   topCards.innerHTML = primeras.map(tarjeta).join("");
 
