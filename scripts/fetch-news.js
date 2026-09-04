@@ -83,21 +83,13 @@ function limpiarHtml(raw) {
   return raw.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 }
 
-// Google News (y a veces microlink al pasar por su página intermedia) no
-// entrega la foto real de la nota, sino un ícono genérico propio de Google
-// (siempre el mismo, aloja en googleusercontent.com/gstatic.com). Si
-// dejáramos pasar esa imagen, se mostraría el logo de Google en vez de algo
-// relacionado con la nota. Mejor tratarla como "sin imagen": así el sitio
-// usa el logo de Agro Cordobés de respaldo (ver imgOFallback en index.html).
-function esImagenGenerica(url) {
-  if (!url) return true;
-  try {
-    const host = new URL(url).hostname;
-    return /(^|\.)googleusercontent\.com$/.test(host) || /(^|\.)gstatic\.com$/.test(host) || /(^|\.)google\.com$/.test(host);
-  } catch {
-    return true;
-  }
-}
+// Ojo: NO alcanza con mirar el dominio de la imagen. Google también re-aloja
+// fotos reales de cada nota en googleusercontent.com (cada una con su propia
+// URL), así que bloquear todo ese dominio tira abajo fotos válidas. La única
+// señal confiable de "ícono genérico de Google" es que la MISMA URL se repite
+// en varias notas distintas (eso sí es un placeholder, nunca una foto real).
+// Por eso la limpieza se hace después, comparando todas las notas entre sí
+// (ver limpiarImagenesDuplicadas), no acá por nota individual.
 
 function parsearItem(itemXml, nombreFuente, categoriaPorDefecto) {
   let titulo = extraerTag(itemXml, "title") || "Sin título";
@@ -146,7 +138,7 @@ function parsearItem(itemXml, nombreFuente, categoriaPorDefecto) {
     categoria,
     bajada,
     fecha: isNaN(fecha) ? new Date().toISOString() : fecha.toISOString(),
-    imagen: esImagenGenerica(imagen) ? null : imagen,
+    imagen: imagen || null,
   };
 }
 
@@ -185,8 +177,7 @@ async function buscarImagenDeArticulo(url) {
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(12000) });
     if (!res.ok) return null; // incluye el caso de 429 (límite diario gratis agotado)
     const data = await res.json();
-    const url = data?.data?.image?.url || null;
-    return esImagenGenerica(url) ? null : url;
+    return data?.data?.image?.url || null;
   } catch {
     return null; // si falla, la nota queda sin imagen y usa el placeholder, no rompe nada
   }
@@ -224,12 +215,26 @@ async function main() {
 
   const nuevoHistorial = todas.slice(0, MAX_HISTORIAL);
 
-  // Notas viejas que hayan quedado con el ícono genérico de Google (de
-  // corridas anteriores, antes de este chequeo) también se limpian, para
-  // que abajo se les vuelva a intentar buscar una imagen real.
-  for (const nota of nuevoHistorial) {
-    if (esImagenGenerica(nota.imagen)) nota.imagen = null;
+  // Si la misma imagen aparece en dos o más notas distintas, no es una foto
+  // real de ninguna de ellas: es un ícono genérico (por ejemplo, el que usa
+  // Google News en su página intermedia antes del redirect). La borramos
+  // para que esas notas usen el logo de Agro Cordobés de respaldo (ver
+  // imgOFallback en index.html). Ojo: esto NO es lo mismo que mirar el
+  // dominio de la imagen, porque Google también re-aloja fotos reales y
+  // distintas por nota bajo el mismo dominio.
+  function limpiarImagenesDuplicadas(notas) {
+    const conteo = new Map();
+    for (const n of notas) {
+      if (n.imagen) conteo.set(n.imagen, (conteo.get(n.imagen) || 0) + 1);
+    }
+    for (const n of notas) {
+      if (n.imagen && conteo.get(n.imagen) > 1) n.imagen = null;
+    }
   }
+
+  // Primera pasada: si ya había duplicados guardados de corridas anteriores,
+  // los limpiamos para volver a intentar buscarles una imagen real.
+  limpiarImagenesDuplicadas(nuevoHistorial);
 
   // A las notas que quedaron sin imagen, les vamos a buscar la foto de
   // portada real de la nota.
@@ -240,6 +245,10 @@ async function main() {
       }
     })
   );
+
+  // Segunda pasada: por si la búsqueda de arriba volvió a traer el mismo
+  // ícono genérico para varias notas en esta misma corrida.
+  limpiarImagenesDuplicadas(nuevoHistorial);
 
   const top3 = nuevoHistorial.slice(0, TOP_N);
 
