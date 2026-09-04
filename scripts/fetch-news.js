@@ -96,9 +96,6 @@ function parsearItem(itemXml, nombreFuente, categoriaPorDefecto) {
   const categoriaRss = extraerTag(itemXml, "category");
   const categoria = normalizarCategoria(categoriaRss || titulo, categoriaPorDefecto);
 
-  // Bajada corta para mostrar debajo del título (nunca la nota completa).
-  const bajada = limpiarHtml(extraerTag(itemXml, "description")).slice(0, 160);
-
   // Si viene de Google News, <source> trae el nombre del medio real
   // (Infocampo, Bichos de Campo, La Voz, etc.) y el título suele traer
   // " - Medio" al final.
@@ -106,6 +103,19 @@ function parsearItem(itemXml, nombreFuente, categoriaPorDefecto) {
   if (fuenteReal && titulo.endsWith(" - " + fuenteReal)) {
     titulo = titulo.slice(0, -(" - " + fuenteReal).length);
   }
+
+  // Bajada corta para mostrar debajo del título (nunca la nota completa).
+  // Ojo: la <description> de Google News casi nunca trae un resumen real:
+  // en general es el mismo título de vuelta, seguido del nombre de la
+  // fuente. Si al sacarle la fuente queda exactamente el título, no hay
+  // nada nuevo que mostrar: mejor dejar la bajada vacía que repetir el
+  // título dos veces en la tarjeta.
+  let bajada = limpiarHtml(extraerTag(itemXml, "description"));
+  if (fuenteReal && bajada.endsWith(fuenteReal)) {
+    bajada = bajada.slice(0, bajada.length - fuenteReal.length).trim();
+  }
+  const bajadaEsRedundante = !bajada || bajada.toLowerCase() === titulo.toLowerCase();
+  bajada = bajadaEsRedundante ? "" : bajada.slice(0, 160);
 
   let link = extraerTag(itemXml, "link");
   if (!link) {
