@@ -62,16 +62,21 @@
   /* Fila superior: primeras 2 notas + widgets de clima/dólar */
   .top-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 190px;
+    grid-template-columns: minmax(0, 1fr) 190px;
     gap: 12px;
     margin-bottom: 12px;
   }
+  .top-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
   @media (max-width: 820px) {
-    .top-row { grid-template-columns: 1fr 1fr; }
-    .widgets-col { grid-column: 1 / -1; flex-direction: row; }
+    .top-row { grid-template-columns: 1fr; }
+    .widgets-col { flex-direction: row; }
   }
   @media (max-width: 560px) {
-    .top-row { grid-template-columns: 1fr; }
+    .top-cards { grid-template-columns: 1fr; }
     .widgets-col { flex-direction: column; }
   }
 
@@ -89,23 +94,6 @@
     flex: 1;
   }
   .widget-box iframe { width: 100%; height: 150px; border: 0; display: block; }
-  .widget-placeholder {
-    font-size: 10.5px;
-    color: var(--gris-texto);
-    padding: 8px;
-    text-align: left;
-    border: 1px dashed var(--gris-borde);
-    border-radius: 4px;
-  }
-  .widget-placeholder code {
-    display: block;
-    margin-top: 4px;
-    font-size: 9.5px;
-    background: #f0f1ec;
-    padding: 3px;
-    border-radius: 3px;
-    word-break: break-all;
-  }
 
   /* Grilla del resto de las notas */
   .grilla {
@@ -209,7 +197,19 @@
   </div>
 
   <div class="top-row" id="top-row">
-    <div class="estado">Cargando…</div>
+    <div class="top-cards" id="top-cards">
+      <div class="estado">Cargando…</div>
+    </div>
+    <aside class="widgets-col">
+      <div class="widget-box">
+        <div id="weather-widget-slot"><div id="mrwid88987d08777f05b0c1cecd3f092ab9d8"><script type="text/javascript" async src="https://api.meteored.com/widget/loader/88987d08777f05b0c1cecd3f092ab9d8"></script></div></div>
+      </div>
+      <div class="widget-box" style="padding:4px;">
+        <iframe
+          src="https://www.cotizacion-dolar.com.ar/recursos-webmaster/promedios/cotizacion-argentina-adaptable.php"
+          frameborder="0" scrolling="no" title="Cotización del dólar"></iframe>
+      </div>
+    </aside>
   </div>
 
   <div class="grilla" id="grilla"></div>
@@ -263,36 +263,19 @@ function pintarNotas() {
   const linksTop = new Set(DATA.top3.map((n) => n.link));
   const todas = [...DATA.top3, ...DATA.historial.filter((n) => !linksTop.has(n.link))];
 
-  const topRow = document.getElementById("top-row");
+  const topCards = document.getElementById("top-cards");
   const grilla = document.getElementById("grilla");
 
   if (todas.length === 0) {
-    topRow.innerHTML = "";
-    grilla.innerHTML = `<div class="estado">Todavía no hay notas cargadas.</div>`;
+    topCards.innerHTML = `<div class="estado">Todavía no hay notas cargadas.</div>`;
+    grilla.innerHTML = "";
     return;
   }
 
   const primeras = todas.slice(0, 2);
   const resto = todas.slice(2);
 
-  topRow.innerHTML =
-    primeras.map(tarjeta).join("") +
-    `<aside class="widgets-col">
-      <div class="widget-box">
-        <div id="weather-widget-slot">
-          <div class="widget-placeholder">
-            Widget del tiempo (Meteored) para Córdoba. Generalo en
-            meteored.com.ar/widget y pegá el código acá
-            (<code>id="weather-widget-slot"</code> en index.html).
-          </div>
-        </div>
-      </div>
-      <div class="widget-box" style="padding:4px;">
-        <iframe
-          src="https://www.cotizacion-dolar.com.ar/recursos-webmaster/promedios/cotizacion-argentina-adaptable.php"
-          frameborder="0" scrolling="no" title="Cotización del dólar"></iframe>
-      </div>
-    </aside>`;
+  topCards.innerHTML = primeras.map(tarjeta).join("");
 
   grilla.innerHTML = resto.length
     ? resto.map(tarjeta).join("")
@@ -305,7 +288,7 @@ async function iniciar() {
     DATA = await cargarJSON("data/data.json");
     pintarNotas();
   } catch (err) {
-    document.getElementById("top-row").innerHTML = "";
+    document.getElementById("top-cards").innerHTML = "";
     document.getElementById("grilla").innerHTML = `<div class="estado">No se pudo cargar las noticias. Probá recargar la página.</div>`;
     console.error(err);
   }
