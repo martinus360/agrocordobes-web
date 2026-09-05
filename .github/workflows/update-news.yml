@@ -18,6 +18,8 @@ jobs:
           node-version: "22"
       - name: Correr el bot de noticias
         run: node scripts/fetch-news.js
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
       - name: Commitear data.json si cambió
         run: |
           git config user.name "agrocordobes-bot"
