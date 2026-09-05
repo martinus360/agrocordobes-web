@@ -1,9 +1,17 @@
 {
-  "_instrucciones": "Estos son feeds de Google News filtrados por tema + Córdoba/campo. Google News agrega notas de varios portales (Infocampo, Bichos de Campo, La Voz, etc.) sin bloquear pedidos automáticos, y cada nota linkea al portal original real. 'categoria' es la que se usa si Google News no la especifica. Ojo: las URLs de acá son un punto de partida, probalas en el navegador antes de lanzar (ver README).",
+  "_instrucciones": "Hay dos tipos de fuentes acá. Las 'Google News - ...' son búsquedas ya filtradas por tema + Córdoba/campo: Google News agrega notas de varios portales (Infocampo, Bichos de Campo, La Voz, etc.) sin bloquear pedidos automáticos, y cada nota linkea al portal original real. Las demás son feeds RSS directos de medios agropecuarios (Agroverdad, Bichos de Campo, TodoAgro, etc.) — cubren todo el país, no solo Córdoba, así que llevan 'soloCordoba': true para que fetch-news.js descarte las notas que no mencionen Córdoba en el título/descripción/categorías. Agroverdad es la excepción: es un medio hecho en Córdoba ('Desde Córdoba para todo el país'), así que no se filtra. 'categoria' es la que se usa si el feed no especifica una categoría reconocible. Ojo: las URLs de acá son un punto de partida, probalas en el navegador antes de lanzar (ver README).",
   "fuentes": [
     { "nombre": "Google News - Clima y economía del campo Córdoba", "rss": "https://news.google.com/rss/search?q=(clima%20OR%20pron%C3%B3stico%20OR%20paritaria%20OR%20d%C3%B3lar)%20campo%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Info Campo" },
     { "nombre": "Google News - Infraestructura y política agropecuaria Córdoba", "rss": "https://news.google.com/rss/search?q=(caminos%20rurales%20OR%20obras%20OR%20pol%C3%ADtica%20agropecuaria%20OR%20provincia)%20campo%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Agro Verdad" },
     { "nombre": "Google News - Granos y mercados Córdoba", "rss": "https://news.google.com/rss/search?q=(soja%20OR%20ma%C3%ADz%20OR%20trigo%20OR%20cosecha%20OR%20siembra%20OR%20hacienda)%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Todo Agro" },
-    { "nombre": "Google News - Agro Córdoba general", "rss": "https://news.google.com/rss/search?q=agro%20OR%20agropecuario%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Todo Agro" }
+    { "nombre": "Google News - Agro Córdoba general", "rss": "https://news.google.com/rss/search?q=agro%20OR%20agropecuario%20C%C3%B3rdoba%20Argentina%20when:2d&hl=es-419&gl=AR&ceid=AR:es-419", "categoria": "Todo Agro" },
+    { "nombre": "Agroverdad", "rss": "https://agroverdad.com.ar/feed/", "categoria": "Agro Verdad" },
+    { "nombre": "Bichos de Campo", "rss": "https://bichosdecampo.com/feed/", "categoria": "Todo Agro", "soloCordoba": true },
+    { "nombre": "TodoAgro", "rss": "https://www.todoagro.com.ar/noticias/feed/", "categoria": "Todo Agro", "soloCordoba": true },
+    { "nombre": "Noticias de Campo", "rss": "https://feeds.feedburner.com/noticiasdecampo", "categoria": "Todo Agro", "soloCordoba": true },
+    { "nombre": "Agrositio", "rss": "https://www.agrositio.com.ar/rss/rss.php?area=destacadas", "categoria": "Todo Agro", "soloCordoba": true },
+    { "nombre": "Agroads News", "rss": "https://news.agroads.com.ar/feed/", "categoria": "Todo Agro", "soloCordoba": true },
+    { "nombre": "deCampoNoticias", "rss": "https://www.decamponoticias.com/feed/", "categoria": "Todo Agro", "soloCordoba": true },
+    { "nombre": "Noticias AgroPecuarias", "rss": "https://www.noticiasagropecuarias.com/feed/", "categoria": "Todo Agro", "soloCordoba": true }
   ]
 }
