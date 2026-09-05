@@ -48,7 +48,10 @@
     align-items: flex-start;
     gap: 2px;
   }
-  .brand-block img { height: 44px; display: block; }
+  /* El ancho del logo lo fija JS (ver el bloque de brand-date al final del
+     script), igualándolo al ancho del texto de fecha/hora de abajo — que
+     cambia de largo según el día — en vez de una altura fija chica. */
+  .brand-block img { height: auto; width: 90px; max-width: 320px; display: block; }
   .brand-date {
     font-size: 10.5px;
     font-weight: 700;
@@ -68,14 +71,19 @@
   .cabecera-wrap a { display: block; height: 100%; }
   .cabecera-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  /* Fila superior: primeras 2 notas + widgets de clima/dólar/granos.
-     El ancho de la columna de widgets (330px) está pensado para que el
-     widget del clima de Meteored (que viene con un tamaño fijo de 300px)
-     entre completo, sin que el navegador lo recorte. */
+  /* Fila superior: notas destacadas (2, 4 o 6 según haga falta, ver
+     ajustarFilasDestacadas() en el JS) + widgets de videos/clima/dólar/
+     granos. El ancho de la columna de widgets (330px) está pensado para
+     que el widget del clima de Meteored (que viene con un tamaño fijo de
+     300px) entre completo, sin que el navegador lo recorte. */
   .top-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 330px;
-    align-items: start;
+    /* "stretch" (no "start"): si la columna de widgets es más baja que las
+       notas destacadas de al lado, se estira para llenar el alto de la
+       fila — y como cada .widget-box de adentro ya tiene flex:1, se reparte
+       el espacio de más entre ellos en vez de dejar un hueco en blanco. */
+    align-items: stretch;
     gap: 12px;
     margin-bottom: 12px;
   }
@@ -102,10 +110,10 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    /* La altura la fija JS (sincronizarAlturaWidgets), igualándola a la
-       columna de las 2 notas destacadas, para que no quede un hueco vacío
-       antes de la fila de 3 notas que sigue. Si los widgets no entran
-       completos en esa altura, se scrollea esta columna sola. */
+    /* La altura la iguala "align-items:stretch" en .top-row a la de las
+       notas destacadas de al lado (ver ajustarFilasDestacadas() en el JS,
+       que agranda esas notas si hace falta). overflow-y queda solo como
+       resguardo por si algún widget externo midiera más de lo esperado. */
     overflow-y: auto;
     scrollbar-width: thin;
   }
@@ -332,7 +340,7 @@
 <main>
   <div class="top-header">
     <div class="brand-block">
-      <img src="assets/logo.png" alt="Agro Cordobés">
+      <img src="assets/logo.png" alt="Agro Cordobés" id="brand-logo">
       <span class="brand-date" id="brand-date"></span>
     </div>
     <div class="cabecera-wrap" id="cabecera"></div>
@@ -454,6 +462,13 @@ function tarjeta(n) {
     </a>`;
 }
 
+// Cuántas notas van arriba, junto a los widgets, en la grilla de 2 columnas
+// de .top-cards (2, 4 o 6 = 1, 2 o 3 filas). Arranca en 2 y la agranda
+// ajustarFilasDestacadas() de a 2 si los widgets de al lado quedan más
+// altos, para que no quede un hueco en blanco al costado.
+let cantidadDestacadas = 2;
+const MAX_DESTACADAS = 6;
+
 function pintarNotas() {
   if (!DATA) return;
   const linksTop = new Set(DATA.top3.map((n) => n.link));
@@ -476,11 +491,12 @@ function pintarNotas() {
     return;
   }
 
-  const primeras = todas.slice(0, 2);
+  const cantidad = Math.min(cantidadDestacadas, todas.length);
+  const primeras = todas.slice(0, cantidad);
   // La grilla de abajo tiene 3 columnas: si sobra 1 o 2 notas sueltas al
   // final, queda una fila incompleta y se ve vacía. Mejor recortarlas y
   // que siempre termine en una fila completa.
-  const restoSinRecortar = todas.slice(2);
+  const restoSinRecortar = todas.slice(cantidad);
   const resto = restoSinRecortar.slice(
     0,
     restoSinRecortar.length - (restoSinRecortar.length % 3)
@@ -520,29 +536,31 @@ function pintarVideos() {
   lista.innerHTML = videos.map(videoItem).join("");
 }
 
-// Le da a la columna de widgets (videos/clima/dólar/granos) el alto de las
-// 2 notas destacadas de al lado MÁS la primera fila de la grilla de abajo,
-// para que entren los 4 widgets sin tener que scrollear dentro de la
-// columna (antes solo tomaba la altura de las 2 destacadas y los widgets
-// de más abajo quedaban escondidos). Si aun así no entran, esta columna
-// scrollea sola (ver overflow-y en .widgets-col).
-function sincronizarAlturaWidgets() {
+// En vez de limitarle la altura a los widgets (clima/dólar/granos/videos) y
+// hacerlos scrollear si no entran, agrandamos la cantidad de notas
+// destacadas de arriba (de a 2, hasta 3 filas = 6 notas) para que la
+// columna de notas quede tan alta como la de los widgets. Así no queda un
+// hueco en blanco al costado y los widgets se ven completos siempre.
+// Se llama de nuevo cada vez que cambia el alto de cualquiera de las 2
+// columnas (clima/TradingView cargan de forma asíncrona y pueden variar su
+// alto después del primer cálculo).
+function ajustarFilasDestacadas() {
   const topCards = document.getElementById("top-cards");
   const widgetsCol = document.querySelector(".widgets-col");
-  const grilla = document.getElementById("grilla");
-  if (!topCards || !widgetsCol) return;
-  // Debajo de 820px el layout pasa a una sola columna (ver @media): ahí los
-  // widgets van en su propia fila y no hay que limitarles la altura.
-  if (window.matchMedia("(max-width: 820px)").matches) {
-    widgetsCol.style.maxHeight = "";
-    return;
+  if (!topCards || !widgetsCol || !DATA) return;
+  // Debajo de 820px el layout pasa a una sola columna (ver @media): ahí no
+  // hay nada que igualar.
+  if (window.matchMedia("(max-width: 820px)").matches) return;
+  let intentos = 0;
+  while (
+    widgetsCol.offsetHeight > topCards.offsetHeight &&
+    cantidadDestacadas < MAX_DESTACADAS &&
+    intentos < 3
+  ) {
+    cantidadDestacadas += 2;
+    pintarNotas();
+    intentos++;
   }
-  let alto = topCards.offsetHeight;
-  if (grilla && grilla.children.length > 0) {
-    const gapEntreFilas = 12; // mismo valor que margin-bottom de .top-row
-    alto += gapEntreFilas + grilla.children[0].offsetHeight;
-  }
-  widgetsCol.style.maxHeight = alto > 0 ? alto + "px" : "";
 }
 
 async function iniciar() {
@@ -556,16 +574,19 @@ async function iniciar() {
     document.getElementById("grilla").innerHTML = `<div class="estado">No se pudo cargar las noticias. Probá recargar la página.</div>`;
     console.error(err);
   }
-  sincronizarAlturaWidgets();
-  // Las imágenes de las tarjetas cargan asíncronamente y pueden cambiar la
-  // altura de top-cards después del primer cálculo; ResizeObserver lo
-  // detecta y reajusta. También reajustamos si cambia el tamaño de ventana
-  // (por si se cruza el breakpoint de 820px).
+  ajustarFilasDestacadas();
+  // Las imágenes de las tarjetas y los widgets externos (clima, TradingView)
+  // cargan asíncronamente y pueden cambiar de altura después del primer
+  // cálculo; ResizeObserver detecta esos cambios en cualquiera de las 2
+  // columnas y vuelve a ajustar. También reajustamos si cambia el tamaño de
+  // ventana (por si se cruza el breakpoint de 820px).
   const topCardsEl = document.getElementById("top-cards");
-  if (topCardsEl && "ResizeObserver" in window) {
-    new ResizeObserver(sincronizarAlturaWidgets).observe(topCardsEl);
+  const widgetsColEl = document.querySelector(".widgets-col");
+  if ("ResizeObserver" in window) {
+    if (topCardsEl) new ResizeObserver(ajustarFilasDestacadas).observe(topCardsEl);
+    if (widgetsColEl) new ResizeObserver(ajustarFilasDestacadas).observe(widgetsColEl);
   }
-  window.addEventListener("resize", sincronizarAlturaWidgets);
+  window.addEventListener("resize", ajustarFilasDestacadas);
 }
 
 async function pintarCabecera() {
@@ -592,8 +613,12 @@ document.getElementById("categorias").addEventListener("click", (e) => {
   document
     .querySelectorAll(".cat-btn")
     .forEach((b) => b.classList.toggle("is-active", b === btn));
+  // Al cambiar de categoría cambia la lista de notas disponibles, así que
+  // arrancamos de nuevo con 1 sola fila destacada y dejamos que
+  // ajustarFilasDestacadas() la agrande si hace falta.
+  cantidadDestacadas = 2;
   pintarNotas();
-  sincronizarAlturaWidgets();
+  ajustarFilasDestacadas();
 });
 
 const dateEl = document.getElementById("brand-date");
@@ -601,6 +626,14 @@ if (dateEl) {
   dateEl.textContent = new Date().toLocaleString("es-AR", {
     day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit",
   }).toUpperCase();
+  // El logo se agranda para que ocupe un poco más que el ancho del texto de
+  // fecha/hora de abajo (en vez de quedar chico con una altura fija), así
+  // se ajusta solo aunque cambie el largo del texto según el día.
+  const logoEl = document.getElementById("brand-logo");
+  if (logoEl) {
+    const anchoFecha = dateEl.offsetWidth;
+    if (anchoFecha > 0) logoEl.style.width = Math.round(anchoFecha * 1.25) + "px";
+  }
 }
 
 iniciar();
