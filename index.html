@@ -79,11 +79,16 @@
   .top-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 330px;
-    /* "stretch" (no "start"): si la columna de widgets es más baja que las
-       notas destacadas de al lado, se estira para llenar el alto de la
-       fila — y como cada .widget-box de adentro ya tiene flex:1, se reparte
-       el espacio de más entre ellos en vez de dejar un hueco en blanco. */
-    align-items: stretch;
+    /* "start" (no "stretch"): con "stretch" ambas columnas quedaban SIEMPRE
+       con la misma altura por CSS, sin importar el contenido — lo que hacía
+       que ajustarFilasDestacadas() nunca detectara ninguna diferencia (las
+       alturas ya venían igualadas de antemano) y todo ese espacio de más
+       terminaba estirando cada tarjeta de noticia por dentro (el hueco en
+       blanco quedaba debajo de "LEER NOTA »"). Con "start" cada columna
+       mide su alto real y es la función la que agranda la cantidad de
+       noticias destacadas hasta emparejarlas.
+    */
+    align-items: start;
     gap: 12px;
     margin-bottom: 12px;
   }
@@ -110,10 +115,11 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    /* La altura la iguala "align-items:stretch" en .top-row a la de las
-       notas destacadas de al lado (ver ajustarFilasDestacadas() en el JS,
-       que agranda esas notas si hace falta). overflow-y queda solo como
-       resguardo por si algún widget externo midiera más de lo esperado. */
+    /* Mide su alto natural (ver .top-row: align-items:start). Es
+       ajustarFilasDestacadas() en el JS la que agranda la cantidad de
+       notas destacadas de al lado hasta igualar esta altura. overflow-y
+       queda solo como resguardo por si algún widget externo midiera más
+       de lo esperado. */
     overflow-y: auto;
     scrollbar-width: thin;
   }
