@@ -1,4 +1,3 @@
-
 // fetch-news.js
 // Lee los feeds RSS configurados en data/feeds.json, saca las notas más
 // recientes, arma el top 3 y mantiene un historial rotativo de 30 notas.
