@@ -1,3 +1,4 @@
+
 // fetch-news.js
 // Lee los feeds RSS configurados en data/feeds.json, saca las notas más
 // recientes, arma el top 3 y mantiene un historial rotativo de 30 notas.
@@ -16,6 +17,7 @@ import path from "node:path";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FEEDS_PATH = path.join(__dirname, "..", "data", "feeds.json");
 const DATA_PATH = path.join(__dirname, "..", "data", "data.json");
+const VIDEOS_PATH = path.join(__dirname, "..", "data", "videos.json");
 const MAX_HISTORIAL = 30;
 const TOP_N = 3;
 
@@ -296,10 +298,81 @@ function elegirTop3(nuevoHistorial) {
   return elegidas;
 }
 
+// --- widget de videos (YouTube Data API) ---
+//
+// Trae, para cada canal listado en data/videos.json, su video subido más
+// reciente. Necesita la variable de entorno YOUTUBE_API_KEY (secreto de
+// GitHub Actions, ver update-news.yml). Si no está configurada, o si la API
+// falla para todos los canales (por ejemplo se agotó la cuota gratis del
+// día), se deja el widget tal como estaba en la corrida anterior en vez de
+// vaciarlo.
+async function buscarUltimoVideoDeCanal(canal, apiKey) {
+  try {
+    const url =
+      "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=" +
+      encodeURIComponent(canal.channelId) +
+      "&order=date&maxResults=1&type=video&key=" +
+      encodeURIComponent(apiKey);
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) {
+      console.warn(`[video: ${canal.nombre}] la API respondió ${res.status}, se salta.`);
+      return null;
+    }
+    const data = await res.json();
+    const item = data.items && data.items[0];
+    if (!item || !item.id || !item.id.videoId) return null;
+    const videoId = item.id.videoId;
+    const snippet = item.snippet || {};
+    const thumbs = snippet.thumbnails || {};
+    const miniatura =
+      (thumbs.high && thumbs.high.url) ||
+      (thumbs.medium && thumbs.medium.url) ||
+      (thumbs.default && thumbs.default.url) ||
+      null;
+    return {
+      videoId,
+      titulo: snippet.title || "",
+      link: "https://www.youtube.com/watch?v=" + videoId,
+      miniatura,
+      canal: canal.nombre,
+      categoria: canal.categoria || "",
+      fecha: snippet.publishedAt || new Date().toISOString(),
+    };
+  } catch (err) {
+    console.warn(`[video: ${canal.nombre}] error al consultar la API: ${err.message}`);
+    return null;
+  }
+}
+
+async function obtenerVideos(videosPrevios) {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) {
+    console.warn("No hay YOUTUBE_API_KEY configurada: se deja el widget de videos como estaba.");
+    return videosPrevios;
+  }
+  let canales = [];
+  try {
+    const contenido = JSON.parse(await readFile(VIDEOS_PATH, "utf-8"));
+    canales = contenido.canales || [];
+  } catch {
+    return videosPrevios; // no hay videos.json todavía
+  }
+  if (canales.length === 0) return videosPrevios;
+
+  const resultados = await Promise.all(
+    canales.map((canal) => buscarUltimoVideoDeCanal(canal, apiKey))
+  );
+  const videosNuevos = resultados.filter(Boolean);
+  // Mantenemos el orden de videos.json (así se puede intercalar, por ej.
+  // un canal de noticias y uno de humor, a propósito).
+  return videosNuevos.length > 0 ? videosNuevos : videosPrevios;
+}
+
 async function main() {
   const { fuentes } = JSON.parse(await readFile(FEEDS_PATH, "utf-8"));
 
   let historial = [];
+  let videosPrevios = [];
   try {
     const previo = JSON.parse(await readFile(DATA_PATH, "utf-8"));
     // Migramos categorías viejas (de antes del filtro por tema) a las nuevas.
@@ -307,11 +380,15 @@ async function main() {
       ...n,
       categoria: migrarCategoriaVieja(n.categoria),
     }));
+    videosPrevios = previo.videos || [];
   } catch {
     // primera corrida, no hay data.json todavía
   }
 
-  const resultados = await Promise.all(fuentes.map(leerFeed));
+  const [resultados, videos] = await Promise.all([
+    Promise.all(fuentes.map(leerFeed)),
+    obtenerVideos(videosPrevios),
+  ]);
   const notasNuevas = resultados.flat();
 
   if (notasNuevas.length === 0) {
@@ -378,11 +455,12 @@ async function main() {
     actualizado: new Date().toISOString(),
     top3,
     historial: nuevoHistorial,
+    videos,
   };
 
   await writeFile(DATA_PATH, JSON.stringify(salida, null, 2), "utf-8");
   console.log(
-    `Listo: ${nuevoHistorial.length} notas en historial, top3 con ${top3.length}.`
+    `Listo: ${nuevoHistorial.length} notas en historial, top3 con ${top3.length}, ${videos.length} videos.`
   );
 }
 
