@@ -1,0 +1,7 @@
+{
+  "_instrucciones": "Canales de YouTube de donde se saca el video subido más reciente para el widget 'Videos del campo'. fetch-news.js le pide a cada canal, en cada corrida, su último video (vía YouTube Data API v3, con la YOUTUBE_API_KEY cargada como secreto en GitHub Actions). channelId es el ID real del canal (empieza con 'UC...'), no el @handle: así no depende de que la API resuelva el handle bien en cada corrida. Para agregar un canal: entrá a su página de YouTube con el navegador, 'Ver código fuente de la página' (Ctrl+U), buscá 'channelId' o 'externalId' y copiá el valor que empieza con UC. El orden de la lista es el orden en que aparecen en el widget (se puede intercalar a propósito, por ejemplo un canal de noticias y uno de humor). Si en algún momento se agota la cuota gratis diaria de la API o falla la consulta, el widget se queda con los videos de la corrida anterior en vez de vaciarse.",
+  "canales": [
+    { "nombre": "Agrotendencia TV", "channelId": "UCOXEnwToecD7I-cCHiLc_kw", "categoria": "Noticias" },
+    { "nombre": "CAMPA STREAMING", "channelId": "UCFUu_qUxmUN49ZRAD-Bf03Q", "categoria": "Humor" }
+  ]
+}
