@@ -35,7 +35,7 @@
   main { max-width: 1080px; margin: 0 auto; padding: 12px 16px 30px; }
 
   /* Header: logo + fecha a la izquierda, banner de publicidad a la derecha.
-     Sin menú de categorías — el sitio real no tiene uno. */
+     El menú de categorías (filtro) va debajo, ver .categorias. */
   .top-header {
     display: flex;
     gap: 10px;
@@ -102,6 +102,12 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    /* La altura la fija JS (sincronizarAlturaWidgets), igualándola a la
+       columna de las 2 notas destacadas, para que no quede un hueco vacío
+       antes de la fila de 3 notas que sigue. Si los widgets no entran
+       completos en esa altura, se scrollea esta columna sola. */
+    overflow-y: auto;
+    scrollbar-width: thin;
   }
   .widget-box {
     background: #fff;
@@ -153,6 +159,7 @@
   .card-badge {
     position: absolute;
     top: 8px; right: 8px;
+    max-width: calc(100% - 16px);
     background: var(--verde);
     color: #fff;
     font-size: 9.5px;
@@ -161,6 +168,43 @@
     letter-spacing: 0.3px;
     padding: 3px 8px;
     border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Menú de navegación / filtro por categoría. Al tocar una categoría se
+     filtran las notas de toda la página (destacadas + grilla) sin recargar. */
+  .categorias {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 0 12px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--gris-borde);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .categorias::-webkit-scrollbar { display: none; }
+  .cat-btn {
+    flex-shrink: 0;
+    border: 1px solid var(--gris-borde);
+    background: #fff;
+    color: var(--verde-oscuro);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .cat-btn:hover { border-color: var(--verde); color: var(--verde); }
+  .cat-btn.is-active {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: #fff;
   }
 
   .card-body { padding: 10px 12px 6px; flex: 1; }
@@ -221,6 +265,15 @@
     </div>
     <div class="cabecera-wrap" id="cabecera"></div>
   </div>
+
+  <nav class="categorias" id="categorias" aria-label="Filtrar noticias por categoría">
+    <button type="button" class="cat-btn is-active" data-cat="Todas">Todas</button>
+    <button type="button" class="cat-btn" data-cat="Agricultura">Agricultura</button>
+    <button type="button" class="cat-btn" data-cat="Ganadería">Ganadería</button>
+    <button type="button" class="cat-btn" data-cat="Mercados & Cotizaciones">Mercados &amp; Cotizaciones</button>
+    <button type="button" class="cat-btn" data-cat="Clima">Clima</button>
+    <button type="button" class="cat-btn" data-cat="Maquinaria">Maquinaria</button>
+  </nav>
 
   <div class="top-row" id="top-row">
     <div class="top-cards" id="top-cards">
@@ -288,6 +341,7 @@
 
 <script>
 let DATA = null;
+let FILTRO_ACTIVO = "Todas";
 
 async function cargarJSON(ruta) {
   const res = await fetch(ruta + "?v=" + Date.now());
@@ -327,13 +381,21 @@ function tarjeta(n) {
 function pintarNotas() {
   if (!DATA) return;
   const linksTop = new Set(DATA.top3.map((n) => n.link));
-  const todas = [...DATA.top3, ...DATA.historial.filter((n) => !linksTop.has(n.link))];
+  const todasSinFiltrar = [...DATA.top3, ...DATA.historial.filter((n) => !linksTop.has(n.link))];
+  const todas =
+    FILTRO_ACTIVO === "Todas"
+      ? todasSinFiltrar
+      : todasSinFiltrar.filter((n) => n.categoria === FILTRO_ACTIVO);
 
   const topCards = document.getElementById("top-cards");
   const grilla = document.getElementById("grilla");
 
   if (todas.length === 0) {
-    topCards.innerHTML = `<div class="estado">Todavía no hay notas cargadas.</div>`;
+    topCards.innerHTML = `<div class="estado">${
+      FILTRO_ACTIVO === "Todas"
+        ? "Todavía no hay notas cargadas."
+        : `Por ahora no hay notas de ${FILTRO_ACTIVO}.`
+    }</div>`;
     grilla.innerHTML = "";
     return;
   }
@@ -355,6 +417,24 @@ function pintarNotas() {
     : "";
 }
 
+// Iguala la altura de la columna de widgets (clima/dólar/granos) a la de
+// las 2 notas destacadas de al lado, para que no quede un espacio vacío
+// antes de la fila de 3 notas que sigue. Si los widgets no entran, esta
+// columna scrollea sola (ver overflow-y en .widgets-col).
+function sincronizarAlturaWidgets() {
+  const topCards = document.getElementById("top-cards");
+  const widgetsCol = document.querySelector(".widgets-col");
+  if (!topCards || !widgetsCol) return;
+  // Debajo de 820px el layout pasa a una sola columna (ver @media): ahí los
+  // widgets van en su propia fila y no hay que limitarles la altura.
+  if (window.matchMedia("(max-width: 820px)").matches) {
+    widgetsCol.style.maxHeight = "";
+    return;
+  }
+  const alto = topCards.offsetHeight;
+  widgetsCol.style.maxHeight = alto > 0 ? alto + "px" : "";
+}
+
 async function iniciar() {
   pintarCabecera();
   try {
@@ -365,6 +445,16 @@ async function iniciar() {
     document.getElementById("grilla").innerHTML = `<div class="estado">No se pudo cargar las noticias. Probá recargar la página.</div>`;
     console.error(err);
   }
+  sincronizarAlturaWidgets();
+  // Las imágenes de las tarjetas cargan asíncronamente y pueden cambiar la
+  // altura de top-cards después del primer cálculo; ResizeObserver lo
+  // detecta y reajusta. También reajustamos si cambia el tamaño de ventana
+  // (por si se cruza el breakpoint de 820px).
+  const topCardsEl = document.getElementById("top-cards");
+  if (topCardsEl && "ResizeObserver" in window) {
+    new ResizeObserver(sincronizarAlturaWidgets).observe(topCardsEl);
+  }
+  window.addEventListener("resize", sincronizarAlturaWidgets);
 }
 
 async function pintarCabecera() {
@@ -383,6 +473,17 @@ async function pintarCabecera() {
     cont.remove();
   }
 }
+
+document.getElementById("categorias").addEventListener("click", (e) => {
+  const btn = e.target.closest(".cat-btn");
+  if (!btn) return;
+  FILTRO_ACTIVO = btn.dataset.cat;
+  document
+    .querySelectorAll(".cat-btn")
+    .forEach((b) => b.classList.toggle("is-active", b === btn));
+  pintarNotas();
+  sincronizarAlturaWidgets();
+});
 
 const dateEl = document.getElementById("brand-date");
 if (dateEl) {
