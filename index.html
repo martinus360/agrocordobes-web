@@ -128,7 +128,9 @@
      YouTube elegidos a mano (ver data/videos.json), no una búsqueda
      genérica — así se puede mezclar un canal de noticias con uno de humor,
      por ejemplo. A diferencia de los demás widget-box, este va con el
-     texto alineado a la izquierda. */
+     texto alineado a la izquierda. Cada video se muestra como una tarjeta
+     vertical (miniatura grande arriba, texto abajo), uno debajo del otro,
+     del mismo estilo que una nota, en vez de una fila chica horizontal. */
   .widget-videos { text-align: left; }
   .widget-videos-titulo {
     font-size: 11px;
@@ -138,25 +140,27 @@
     color: var(--verde-oscuro);
     padding: 2px 2px 6px;
     border-bottom: 1px solid var(--gris-borde);
-    margin-bottom: 4px;
+    margin-bottom: 8px;
   }
   .video-item {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+    display: block;
     text-decoration: none;
     color: inherit;
-    padding: 6px 2px;
+    padding-bottom: 10px;
   }
-  .video-item + .video-item { border-top: 1px solid var(--gris-borde); }
+  .video-item + .video-item {
+    border-top: 1px solid var(--gris-borde);
+    margin-top: 10px;
+    padding-top: 10px;
+  }
   .video-thumb-wrap {
     position: relative;
-    flex-shrink: 0;
-    width: 84px;
+    width: 100%;
     aspect-ratio: 16/9;
     background: #eee;
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
+    margin-bottom: 6px;
   }
   .video-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .video-play {
@@ -165,23 +169,32 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 13px;
-    background: rgba(0, 0, 0, 0.15);
-    text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
   }
-  .video-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .video-play::before {
+    content: "▶";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 15px;
+    padding-left: 3px;
+  }
+  .video-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .video-titulo {
-    font-size: 11.5px;
-    font-weight: 600;
-    line-height: 1.25;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
     color: #1a1a1a;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .video-canal { font-size: 10px; color: var(--gris-texto); }
+  .video-canal { font-size: 11px; color: var(--gris-texto); }
 
   /* Grilla del resto de las notas */
   .grilla {
@@ -339,6 +352,10 @@
       <div class="estado">Cargando…</div>
     </div>
     <aside class="widgets-col">
+      <div class="widget-box widget-videos" id="videos-widget-slot" style="display:none;">
+        <div class="widget-videos-titulo">Videos del campo</div>
+        <div id="videos-lista"></div>
+      </div>
       <div class="widget-box">
         <div id="weather-widget-slot"><div id="mrwid88987d08777f05b0c1cecd3f092ab9d8"><script type="text/javascript" async src="https://api.meteored.com/widget/loader/88987d08777f05b0c1cecd3f092ab9d8"></script></div></div>
       </div>
@@ -386,10 +403,6 @@
           }
           </script>
         </div>
-      </div>
-      <div class="widget-box widget-videos" id="videos-widget-slot" style="display:none;">
-        <div class="widget-videos-titulo">Videos del campo</div>
-        <div id="videos-lista"></div>
       </div>
     </aside>
   </div>
@@ -485,7 +498,7 @@ function videoItem(v) {
     <a class="video-item" href="${v.link}" target="_blank" rel="noopener">
       <div class="video-thumb-wrap">
         <img src="${v.miniatura}" alt="" loading="lazy" onerror="this.closest('.video-item').remove()">
-        <span class="video-play">▶</span>
+        <span class="video-play"></span>
       </div>
       <div class="video-info">
         <span class="video-titulo">${v.titulo}</span>
@@ -507,13 +520,16 @@ function pintarVideos() {
   lista.innerHTML = videos.map(videoItem).join("");
 }
 
-// Iguala la altura de la columna de widgets (clima/dólar/granos) a la de
-// las 2 notas destacadas de al lado, para que no quede un espacio vacío
-// antes de la fila de 3 notas que sigue. Si los widgets no entran, esta
-// columna scrollea sola (ver overflow-y en .widgets-col).
+// Le da a la columna de widgets (videos/clima/dólar/granos) el alto de las
+// 2 notas destacadas de al lado MÁS la primera fila de la grilla de abajo,
+// para que entren los 4 widgets sin tener que scrollear dentro de la
+// columna (antes solo tomaba la altura de las 2 destacadas y los widgets
+// de más abajo quedaban escondidos). Si aun así no entran, esta columna
+// scrollea sola (ver overflow-y en .widgets-col).
 function sincronizarAlturaWidgets() {
   const topCards = document.getElementById("top-cards");
   const widgetsCol = document.querySelector(".widgets-col");
+  const grilla = document.getElementById("grilla");
   if (!topCards || !widgetsCol) return;
   // Debajo de 820px el layout pasa a una sola columna (ver @media): ahí los
   // widgets van en su propia fila y no hay que limitarles la altura.
@@ -521,7 +537,11 @@ function sincronizarAlturaWidgets() {
     widgetsCol.style.maxHeight = "";
     return;
   }
-  const alto = topCards.offsetHeight;
+  let alto = topCards.offsetHeight;
+  if (grilla && grilla.children.length > 0) {
+    const gapEntreFilas = 12; // mismo valor que margin-bottom de .top-row
+    alto += gapEntreFilas + grilla.children[0].offsetHeight;
+  }
   widgetsCol.style.maxHeight = alto > 0 ? alto + "px" : "";
 }
 
