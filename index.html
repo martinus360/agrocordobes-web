@@ -124,6 +124,65 @@
   .widget-box iframe { border: 0; max-width: 100%; }
   .widget-box .dolar-frame { width: 100%; height: 150px; display: block; }
 
+  /* Widget "Videos del campo": última subida de un par de canales de
+     YouTube elegidos a mano (ver data/videos.json), no una búsqueda
+     genérica — así se puede mezclar un canal de noticias con uno de humor,
+     por ejemplo. A diferencia de los demás widget-box, este va con el
+     texto alineado a la izquierda. */
+  .widget-videos { text-align: left; }
+  .widget-videos-titulo {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--verde-oscuro);
+    padding: 2px 2px 6px;
+    border-bottom: 1px solid var(--gris-borde);
+    margin-bottom: 4px;
+  }
+  .video-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 6px 2px;
+  }
+  .video-item + .video-item { border-top: 1px solid var(--gris-borde); }
+  .video-thumb-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 84px;
+    aspect-ratio: 16/9;
+    background: #eee;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .video-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    background: rgba(0, 0, 0, 0.15);
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  }
+  .video-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .video-titulo {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #1a1a1a;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .video-canal { font-size: 10px; color: var(--gris-texto); }
+
   /* Grilla del resto de las notas */
   .grilla {
     display: grid;
@@ -328,6 +387,10 @@
           </script>
         </div>
       </div>
+      <div class="widget-box widget-videos" id="videos-widget-slot" style="display:none;">
+        <div class="widget-videos-titulo">Videos del campo</div>
+        <div id="videos-lista"></div>
+      </div>
     </aside>
   </div>
 
@@ -417,6 +480,33 @@ function pintarNotas() {
     : "";
 }
 
+function videoItem(v) {
+  return `
+    <a class="video-item" href="${v.link}" target="_blank" rel="noopener">
+      <div class="video-thumb-wrap">
+        <img src="${v.miniatura}" alt="" loading="lazy" onerror="this.closest('.video-item').remove()">
+        <span class="video-play">▶</span>
+      </div>
+      <div class="video-info">
+        <span class="video-titulo">${v.titulo}</span>
+        <span class="video-canal">${v.canal}</span>
+      </div>
+    </a>`;
+}
+
+function pintarVideos() {
+  const slot = document.getElementById("videos-widget-slot");
+  const lista = document.getElementById("videos-lista");
+  if (!slot || !lista) return;
+  const videos = (DATA && DATA.videos) || [];
+  if (videos.length === 0) {
+    slot.style.display = "none";
+    return;
+  }
+  slot.style.display = "";
+  lista.innerHTML = videos.map(videoItem).join("");
+}
+
 // Iguala la altura de la columna de widgets (clima/dólar/granos) a la de
 // las 2 notas destacadas de al lado, para que no quede un espacio vacío
 // antes de la fila de 3 notas que sigue. Si los widgets no entran, esta
@@ -440,6 +530,7 @@ async function iniciar() {
   try {
     DATA = await cargarJSON("data/data.json");
     pintarNotas();
+    pintarVideos();
   } catch (err) {
     document.getElementById("top-cards").innerHTML = "";
     document.getElementById("grilla").innerHTML = `<div class="estado">No se pudo cargar las noticias. Probá recargar la página.</div>`;
