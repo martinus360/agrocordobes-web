@@ -1,6 +1,6 @@
 {
   "_instrucciones": "Poné 1 o 2 banners publicitarios. Si hay 2, rotan solos cada 8 segundos (empezando en uno al azar, no siempre en el primero). Cambiá esto una vez por mes, nada más.",
   "elementos": [
-    { "imagen": "assets/velez.gif", "link": "https://youtu.be/DO7v8a5wIMw", "alt": "Alto Nivel Vélez Sarsfield" }
+    { "imagen": "assets/banner_1200x200.gif", "link": "https://youtu.be/Ds2cjg-mbuk", "alt": "Cuotas sin interés con Tarjeta Cordobesa para las familias" }
   ]
 }
