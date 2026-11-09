@@ -1,6 +1,6 @@
 {
-  "_instrucciones": "Poné 1 o 2 banners publicitarios. Si hay 2, rotan solos cada 8 segundos (empezando en uno al azar, no siempre en el primero). Cambiá esto una vez por mes, nada más.",
-  "elementos": [
-    { "imagen": "assets/image.gif", "link": "https://youtu.be/AznqGiudAaQ", "alt": "Seguimos haciendo" }
-  ]
+    "_instrucciones": "Poné 1 o 2 banners publicitarios. Si hay 2, rotan solos cada 8 segundos (empezando en uno al azar, no siempre en el primero). Cambiá esto una vez por mes, nada más.",
+    "elementos": [
+          { "imagen": "assets/autopista-r19_cba-sf_tramo-nuevo_1140x200px.gif", "link": "https://youtu.be/uw6YQymicb0", "alt": "Autopista Córdoba - San Francisco" }
+    ]
 }
