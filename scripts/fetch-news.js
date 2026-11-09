@@ -240,10 +240,6 @@ function sonMismoTema(a, b) {
   return comunes / Math.min(palabrasA.size, palabrasB.size) >= 0.6;
 }
 
-// Recorre las notas (ya ordenadas por fecha, más nueva primero) y descarta
-// cualquiera que sea, en esencia, la misma noticia que otra ya elegida —
-// aunque venga de un medio distinto. Se queda con la primera que aparece
-// (la más reciente) de cada tema.
 function quitarDuplicadosPorTema(notas) {
   const resultado = [];
   for (const nota of notas) {
@@ -256,17 +252,14 @@ function quitarDuplicadosPorTema(notas) {
 
 async function buscarImagenDeArticulo(url) {
   try {
-    // microlink.io renderiza la página con un navegador real (headless),
-  // así que sí puede seguir el redirect de Google News y otras páginas
-  // que necesitan JavaScript para mostrar el contenido final.
-  const apiUrl =
-    "https://api.microlink.io?url=" + encodeURIComponent(url) + "&meta=true";
+    const apiUrl =
+      "https://api.microlink.io?url=" + encodeURIComponent(url) + "&meta=true";
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(12000) });
-    if (!res.ok) return null; // incluye el caso de 429 (límite diario agotado o pedidos demasiado seguidos)
-  const data = await res.json();
+    if (!res.ok) return null;
+    const data = await res.json();
     return data?.data?.image?.url || null;
   } catch {
-    return null; // si falla, la nota queda sin imagen y usa el placeholder, no rompe nada
+    return null;
   }
 }
 
@@ -274,12 +267,8 @@ function esperar(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Elige las 3 notas destacadas priorizando que tengan foto propia y que sean
-// de medios distintos entre sí (para no mostrar 3 notas del mismo portal
-// arriba de todo). Si no hay suficientes notas recientes que cumplan ambas
-// condiciones, va relajando los requisitos de a uno para no dejar huecos.
 function elegirTop3(nuevoHistorial) {
-  const candidatas = nuevoHistorial.slice(0, 12); // solo entre las más recientes
+  const candidatas = nuevoHistorial.slice(0, 12);
 
 function intentar(requiereImagen, requiereFuenteDistinta) {
   const elegidas = [];
@@ -301,14 +290,6 @@ let elegidas = intentar(true, true);
   return elegidas;
 }
 
-// --- widget de videos (YouTube Data API) ---
-//
-// Trae, para cada canal listado en data/videos.json, su video subido más
-// reciente. Necesita la variable de entorno YOUTUBE_API_KEY (secreto de
-// GitHub Actions, ver update-news.yml). Si no está configurada, o si la API
-// falla para todos los canales (por ejemplo se agotó la cuota gratis del
-// día), se deja el widget tal como estaba en la corrida anterior en vez de
-// vaciarlo.
 async function buscarUltimoVideoDeCanal(canal, apiKey) {
   try {
     const url =
@@ -358,7 +339,7 @@ async function obtenerVideos(videosPrevios) {
     const contenido = JSON.parse(await readFile(VIDEOS_PATH, "utf-8"));
     canales = contenido.canales || [];
   } catch {
-    return videosPrevios; // no hay videos.json todavía
+    return videosPrevios;
   }
   if (canales.length === 0) return videosPrevios;
 
@@ -366,9 +347,7 @@ const resultados = await Promise.all(
   canales.map((canal) => buscarUltimoVideoDeCanal(canal, apiKey))
   );
   const videosNuevos = resultados.filter(Boolean);
-  // Mantenemos el orden de videos.json (así se puede intercalar, por ej.
-// un canal de noticias y uno de humor, a propósito).
-return videosNuevos.length > 0 ? videosNuevos : videosPrevios;
+  return videosNuevos.length > 0 ? videosNuevos : videosPrevios;
 }
 
 async function main() {
@@ -378,22 +357,17 @@ let historial = [];
   let videosPrevios = [];
   try {
     const previo = JSON.parse(await readFile(DATA_PATH, "utf-8"));
-    // Migramos categorías viejas (de antes del filtro por tema) a las nuevas.
-  historial = (previo.historial || []).map((n) => ({
-    ...n,
-    categoria: migrarCategoriaVieja(n.categoria),
-  }));
+    historial = (previo.historial || []).map((n) => ({
+      ...n,
+      categoria: migrarCategoriaVieja(n.categoria),
+    }));
     videosPrevios = previo.videos || [];
   } catch {
-    // primera corrida, no hay data.json todavía
   }
 
-// Guardamos qué notas ya veníamos arrastrando de corridas anteriores, para
-// no volver a pedirle la imagen a microlink.io todos los días si ya se
-// intentó antes (reintentar notas que ya fallaron todos los días agota la
-// cuota gratuita del servicio sin necesidad). La excepción son las notas a
-// las que la limpieza de íconos duplicados les borra la imagen en esta
-// misma corrida: a esas sí vale la pena reintentarlas.
+// Notas que ya veníamos arrastrando de corridas anteriores: no les
+// reintentamos la imagen todos los días si ya se había intentado antes
+// (reintentar notas que ya fallaron agota la cuota gratis de microlink).
 const linksYaVistos = new Set(historial.map((n) => n.link));
 
 const [resultados, videos] = await Promise.all([
@@ -403,13 +377,10 @@ const [resultados, videos] = await Promise.all([
   const notasNuevas = resultados.flat();
 
 if (notasNuevas.length === 0) {
-  console.warn(
-    "No se pudo leer ninguna noticia de ningún feed. Se deja el data.json existente sin tocar."
-    );
+  console.warn("No se pudo leer ninguna noticia de ningún feed. Se deja el data.json existente sin tocar.");
   return;
 }
 
-// Unimos con el historial, sacamos duplicados por link, ordenamos por fecha desc
 const porLink = new Map();
   for (const nota of [...notasNuevas, ...historial]) {
     if (!porLink.has(nota.link)) porLink.set(nota.link, nota);
@@ -418,20 +389,10 @@ const porLink = new Map();
     (a, b) => new Date(b.fecha) - new Date(a.fecha)
     );
 
-// Antes de armar el historial final, sacamos las notas que son la misma
-// noticia repetida por distintos medios (nos quedamos con la más reciente
-// de cada tema).
 const todas = quitarDuplicadosPorTema(todasOrdenadas);
 
 const nuevoHistorial = todas.slice(0, MAX_HISTORIAL);
 
-// Si la misma imagen aparece en dos o más notas distintas, no es una foto
-// real de ninguna de ellas: es un ícono genérico (por ejemplo, el que usa
-// Google News en su página intermedia antes del redirect). La borramos
-// para que esas notas usen el logo de Agro Cordobés de respaldo (ver
-// imgOFallback en index.html). Ojo: esto NO es lo mismo que mirar el
-// dominio de la imagen, porque Google también re-aloja fotos reales y
-// distintas por nota bajo el mismo dominio.
 function limpiarImagenesDuplicadas(notas) {
   const conteo = new Map();
   for (const n of notas) {
@@ -442,32 +403,25 @@ function limpiarImagenesDuplicadas(notas) {
   }
 }
 
-// Primera pasada: si ya había duplicados guardados de corridas anteriores,
-// los limpiamos para volver a intentar buscarles una imagen real.
 limpiarImagenesDuplicadas(nuevoHistorial);
 
-// A las notas que quedaron sin imagen les vamos a buscar la foto de
-// portada real de la nota con microlink.io, pero no a cualquiera: solo a
-// las que son nuevas de hoy, o a las que la limpieza de arriba les acaba
-// de borrar la imagen (esas sí merecen un reintento). A una nota vieja
-// que ya viene fallando desde antes no tiene sentido insistirle todos los
-// días. Además los pedimos de a uno, con una pausa entre cada uno: el
+// Buscamos imagen solo para notas nuevas de hoy, o para las que la
+// limpieza de arriba les acaba de borrar la imagen (merecen reintento).
+// Una nota vieja que ya viene fallando desde antes no se reintenta todos
+// los días. Además los pedimos de a uno, con pausa entre cada uno: el
 // plan gratis de microlink limita los pedidos por segundo, y pedirlos
-// todos en paralelo (como se hacía antes) hacía que casi todos volvieran
-// con error y sin imagen.
+// todos en paralelo hacía que casi todos volvieran con error.
 const MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA = 15;
   let busquedasHechas = 0;
   for (const nota of nuevoHistorial) {
     if (nota.imagen) continue;
-    if (linksYaVistos.has(nota.link)) continue; // nota vieja que ya se había intentado
-  if (busquedasHechas >= MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA) break; // cuidamos la cuota gratis
-  nota.imagen = await buscarImagenDeArticulo(nota.link);
+    if (linksYaVistos.has(nota.link)) continue;
+    if (busquedasHechas >= MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA) break;
+    nota.imagen = await buscarImagenDeArticulo(nota.link);
     busquedasHechas++;
     await esperar(1200);
   }
 
-// Segunda pasada: por si la búsqueda de arriba volvió a traer el mismo
-// ícono genérico para varias notas en esta misma corrida.
 limpiarImagenesDuplicadas(nuevoHistorial);
 
 const top3 = elegirTop3(nuevoHistorial);
@@ -480,9 +434,7 @@ const salida = {
 };
 
 await writeFile(DATA_PATH, JSON.stringify(salida, null, 2), "utf-8");
-  console.log(
-    `Listo: ${nuevoHistorial.length} notas en historial, top3 con ${top3.length}, ${videos.length} videos. Imágenes buscadas esta corrida: ${busquedasHechas}.`
-    );
+  console.log(`Listo: ${nuevoHistorial.length} notas en historial, top3 con ${top3.length}, ${videos.length} videos. Imágenes buscadas esta corrida: ${busquedasHechas}.`);
 }
 
 main().catch((err) => {
