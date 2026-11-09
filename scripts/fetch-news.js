@@ -24,17 +24,17 @@ const TOP_N = 3;
 
 function extraerTag(xml, tag) {
   // busca <tag>...</tag> o <tag ...>...</tag>, soporta CDATA
-  const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i");
+const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i");
   const m = xml.match(re);
   if (!m) return null;
   return m[1]
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/, "$1")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .trim();
+  .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/, "$1")
+  .replace(/&amp;/g, "&")
+  .replace(/&lt;/g, "<")
+  .replace(/&gt;/g, ">")
+  .replace(/&quot;/g, '"')
+  .replace(/&#39;/g, "'")
+  .trim();
 }
 
 function extraerAtributo(xml, tag, atributo) {
@@ -45,7 +45,7 @@ function extraerAtributo(xml, tag, atributo) {
 
 function extraerItems(xml) {
   // sirve tanto para RSS (<item>) como para Atom (<entry>)
-  const esAtom = !xml.includes("<item") && xml.includes("<entry");
+const esAtom = !xml.includes("<item") && xml.includes("<entry");
   const tagItem = esAtom ? "entry" : "item";
   const re = new RegExp(`<${tagItem}[^>]*>([\\s\\S]*?)</${tagItem}>`, "gi");
   const items = [];
@@ -110,9 +110,9 @@ function limpiarHtml(raw) {
 // mayúsculas/acentos ("Córdoba", "CORDOBA", "cordobés" deben matchear igual).
 function normalizarTexto(texto) {
   return (texto || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
+  .toLowerCase()
+  .normalize("NFD")
+  .replace(/\p{Diacritic}/gu, "");
 }
 
 function mencionaCordoba(texto) {
@@ -132,60 +132,60 @@ function parsearItem(itemXml, nombreFuente, categoriaPorDefecto) {
   const categoriaRss = extraerTag(itemXml, "category");
   const categoria = normalizarCategoria(categoriaRss || titulo, categoriaPorDefecto);
 
-  // Si viene de Google News, <source> trae el nombre del medio real
-  // (Infocampo, Bichos de Campo, La Voz, etc.) y el título suele traer
-  // " - Medio" al final.
-  const fuenteReal = extraerTag(itemXml, "source");
+// Si viene de Google News, <source> trae el nombre del medio real
+// (Infocampo, Bichos de Campo, La Voz, etc.) y el título suele traer
+// " - Medio" al final.
+const fuenteReal = extraerTag(itemXml, "source");
   if (fuenteReal && titulo.endsWith(" - " + fuenteReal)) {
     titulo = titulo.slice(0, -(" - " + fuenteReal).length);
   }
 
-  // Bajada corta para mostrar debajo del título (nunca la nota completa).
-  // Ojo: la <description> de Google News casi nunca trae un resumen real:
-  // en general es el mismo título de vuelta, seguido del nombre de la
-  // fuente. Si al sacarle la fuente queda exactamente el título, no hay
-  // nada nuevo que mostrar: mejor dejar la bajada vacía que repetir el
-  // título dos veces en la tarjeta.
-  let bajada = limpiarHtml(extraerTag(itemXml, "description"));
+// Bajada corta para mostrar debajo del título (nunca la nota completa).
+// Ojo: la <description> de Google News casi nunca trae un resumen real:
+// en general es el mismo título de vuelta, seguido del nombre de la
+// fuente. Si al sacarle la fuente queda exactamente el título, no hay
+// nada nuevo que mostrar: mejor dejar la bajada vacía que repetir el
+// título dos veces en la tarjeta.
+let bajada = limpiarHtml(extraerTag(itemXml, "description"));
   if (fuenteReal && bajada.endsWith(fuenteReal)) {
     bajada = bajada.slice(0, bajada.length - fuenteReal.length).trim();
   }
   const bajadaEsRedundante = !bajada || bajada.toLowerCase() === titulo.toLowerCase();
   bajada = bajadaEsRedundante ? "" : bajada.slice(0, 160);
 
-  let link = extraerTag(itemXml, "link");
+let link = extraerTag(itemXml, "link");
   if (!link) {
     // Atom suele usar <link href="..."/>
-    link = extraerAtributo(itemXml, "link", "href");
+  link = extraerAtributo(itemXml, "link", "href");
   }
 
-  const pubDateRaw =
-    extraerTag(itemXml, "pubDate") ||
-    extraerTag(itemXml, "published") ||
-    extraerTag(itemXml, "updated") ||
-    new Date().toISOString();
+const pubDateRaw =
+  extraerTag(itemXml, "pubDate") ||
+  extraerTag(itemXml, "published") ||
+  extraerTag(itemXml, "updated") ||
+  new Date().toISOString();
   const fecha = new Date(pubDateRaw);
 
-  // Imagen: probamos media:content, enclosure, o una <img> dentro de description
-  let imagen =
-    extraerAtributo(itemXml, "media:content", "url") ||
-    extraerAtributo(itemXml, "enclosure", "url");
+// Imagen: probamos media:content, enclosure, o una <img> dentro de description
+let imagen =
+  extraerAtributo(itemXml, "media:content", "url") ||
+  extraerAtributo(itemXml, "enclosure", "url");
 
-  if (!imagen) {
-    const desc = extraerTag(itemXml, "description") || "";
-    const imgMatch = desc.match(/<img[^>]+src=["']([^"']+)["']/i);
-    if (imgMatch) imagen = imgMatch[1];
-  }
+if (!imagen) {
+  const desc = extraerTag(itemXml, "description") || "";
+  const imgMatch = desc.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (imgMatch) imagen = imgMatch[1];
+}
 
-  return {
-    titulo,
-    link,
-    fuente: fuenteReal || nombreFuente,
-    categoria,
-    bajada,
-    fecha: isNaN(fecha) ? new Date().toISOString() : fecha.toISOString(),
-    imagen: imagen || null,
-  };
+return {
+  titulo,
+  link,
+  fuente: fuenteReal || nombreFuente,
+  categoria,
+  bajada,
+  fecha: isNaN(fecha) ? new Date().toISOString() : fecha.toISOString(),
+  imagen: imagen || null,
+};
 }
 
 async function leerFeed(fuente) {
@@ -193,7 +193,7 @@ async function leerFeed(fuente) {
     const res = await fetch(fuente.rss, {
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "application/rss+xml, application/xml, text/xml, */*",
       },
       signal: AbortSignal.timeout(15000),
@@ -204,16 +204,16 @@ async function leerFeed(fuente) {
     }
     const xml = await res.text();
     const items = extraerItems(xml).slice(0, 10); // no hace falta más de 10 por fuente
-    // Los feeds nacionales (soloCordoba: true) cubren todo el país: acá
-    // descartamos, antes de parsear, cualquier item que no mencione Córdoba
-    // en ningún lado (título, descripción, categorías vienen todos en el
-    // XML crudo del item, así que alcanza con buscar sobre ese texto).
-    const itemsFiltrados = fuente.soloCordoba
-      ? items.filter((it) => mencionaCordoba(it))
-      : items;
+  // Los feeds nacionales (soloCordoba: true) cubren todo el país: acá
+  // descartamos, antes de parsear, cualquier item que no mencione Córdoba
+  // en ningún lado (título, descripción, categorías vienen todos en el
+  // XML crudo del item, así que alcanza con buscar sobre ese texto).
+  const itemsFiltrados = fuente.soloCordoba
+    ? items.filter((it) => mencionaCordoba(it))
+    : items;
     return itemsFiltrados
-      .map((it) => parsearItem(it, fuente.nombre, fuente.categoria))
-      .filter((n) => n.link); // descartamos notas sin link, no sirven
+    .map((it) => parsearItem(it, fuente.nombre, fuente.categoria))
+    .filter((n) => n.link); // descartamos notas sin link, no sirven
   } catch (err) {
     console.warn(`[${fuente.nombre}] error al leer el feed: ${err.message}`);
     return [];
@@ -226,9 +226,9 @@ async function leerFeed(fuente) {
 // idéntico palabra por palabra.
 function palabrasClaveDeTitulo(titulo) {
   return normalizarTexto(titulo)
-    .replace(/[^a-z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter((p) => p.length > 3);
+  .replace(/[^a-z0-9\s]/g, " ")
+  .split(/\s+/)
+  .filter((p) => p.length > 3);
 }
 
 function sonMismoTema(a, b) {
@@ -257,17 +257,21 @@ function quitarDuplicadosPorTema(notas) {
 async function buscarImagenDeArticulo(url) {
   try {
     // microlink.io renderiza la página con un navegador real (headless),
-    // así que sí puede seguir el redirect de Google News y otras páginas
-    // que necesitan JavaScript para mostrar el contenido final.
-    const apiUrl =
-      "https://api.microlink.io?url=" + encodeURIComponent(url) + "&meta=true";
+  // así que sí puede seguir el redirect de Google News y otras páginas
+  // que necesitan JavaScript para mostrar el contenido final.
+  const apiUrl =
+    "https://api.microlink.io?url=" + encodeURIComponent(url) + "&meta=true";
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(12000) });
-    if (!res.ok) return null; // incluye el caso de 429 (límite diario gratis agotado)
-    const data = await res.json();
+    if (!res.ok) return null; // incluye el caso de 429 (límite diario agotado o pedidos demasiado seguidos)
+  const data = await res.json();
     return data?.data?.image?.url || null;
   } catch {
     return null; // si falla, la nota queda sin imagen y usa el placeholder, no rompe nada
   }
+}
+
+function esperar(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Elige las 3 notas destacadas priorizando que tengan foto propia y que sean
@@ -277,20 +281,20 @@ async function buscarImagenDeArticulo(url) {
 function elegirTop3(nuevoHistorial) {
   const candidatas = nuevoHistorial.slice(0, 12); // solo entre las más recientes
 
-  function intentar(requiereImagen, requiereFuenteDistinta) {
-    const elegidas = [];
-    const fuentesUsadas = new Set();
-    for (const nota of candidatas) {
-      if (requiereImagen && !nota.imagen) continue;
-      if (requiereFuenteDistinta && fuentesUsadas.has(nota.fuente)) continue;
-      elegidas.push(nota);
-      fuentesUsadas.add(nota.fuente);
-      if (elegidas.length === TOP_N) break;
-    }
-    return elegidas;
+function intentar(requiereImagen, requiereFuenteDistinta) {
+  const elegidas = [];
+  const fuentesUsadas = new Set();
+  for (const nota of candidatas) {
+    if (requiereImagen && !nota.imagen) continue;
+    if (requiereFuenteDistinta && fuentesUsadas.has(nota.fuente)) continue;
+    elegidas.push(nota);
+    fuentesUsadas.add(nota.fuente);
+    if (elegidas.length === TOP_N) break;
   }
+  return elegidas;
+}
 
-  let elegidas = intentar(true, true);
+let elegidas = intentar(true, true);
   if (elegidas.length < TOP_N) elegidas = intentar(true, false);
   if (elegidas.length < TOP_N) elegidas = intentar(false, true);
   if (elegidas.length < TOP_N) elegidas = intentar(false, false);
@@ -358,109 +362,127 @@ async function obtenerVideos(videosPrevios) {
   }
   if (canales.length === 0) return videosPrevios;
 
-  const resultados = await Promise.all(
-    canales.map((canal) => buscarUltimoVideoDeCanal(canal, apiKey))
+const resultados = await Promise.all(
+  canales.map((canal) => buscarUltimoVideoDeCanal(canal, apiKey))
   );
   const videosNuevos = resultados.filter(Boolean);
   // Mantenemos el orden de videos.json (así se puede intercalar, por ej.
-  // un canal de noticias y uno de humor, a propósito).
-  return videosNuevos.length > 0 ? videosNuevos : videosPrevios;
+// un canal de noticias y uno de humor, a propósito).
+return videosNuevos.length > 0 ? videosNuevos : videosPrevios;
 }
 
 async function main() {
   const { fuentes } = JSON.parse(await readFile(FEEDS_PATH, "utf-8"));
 
-  let historial = [];
+let historial = [];
   let videosPrevios = [];
   try {
     const previo = JSON.parse(await readFile(DATA_PATH, "utf-8"));
     // Migramos categorías viejas (de antes del filtro por tema) a las nuevas.
-    historial = (previo.historial || []).map((n) => ({
-      ...n,
-      categoria: migrarCategoriaVieja(n.categoria),
-    }));
+  historial = (previo.historial || []).map((n) => ({
+    ...n,
+    categoria: migrarCategoriaVieja(n.categoria),
+  }));
     videosPrevios = previo.videos || [];
   } catch {
     // primera corrida, no hay data.json todavía
   }
 
-  const [resultados, videos] = await Promise.all([
-    Promise.all(fuentes.map(leerFeed)),
-    obtenerVideos(videosPrevios),
+// Guardamos qué notas ya veníamos arrastrando de corridas anteriores, para
+// no volver a pedirle la imagen a microlink.io todos los días si ya se
+// intentó antes (reintentar notas que ya fallaron todos los días agota la
+// cuota gratuita del servicio sin necesidad). La excepción son las notas a
+// las que la limpieza de íconos duplicados les borra la imagen en esta
+// misma corrida: a esas sí vale la pena reintentarlas.
+const linksYaVistos = new Set(historial.map((n) => n.link));
+
+const [resultados, videos] = await Promise.all([
+  Promise.all(fuentes.map(leerFeed)),
+  obtenerVideos(videosPrevios),
   ]);
   const notasNuevas = resultados.flat();
 
-  if (notasNuevas.length === 0) {
-    console.warn(
-      "No se pudo leer ninguna noticia de ningún feed. Se deja el data.json existente sin tocar."
+if (notasNuevas.length === 0) {
+  console.warn(
+    "No se pudo leer ninguna noticia de ningún feed. Se deja el data.json existente sin tocar."
     );
-    return;
-  }
+  return;
+}
 
-  // Unimos con el historial, sacamos duplicados por link, ordenamos por fecha desc
-  const porLink = new Map();
+// Unimos con el historial, sacamos duplicados por link, ordenamos por fecha desc
+const porLink = new Map();
   for (const nota of [...notasNuevas, ...historial]) {
     if (!porLink.has(nota.link)) porLink.set(nota.link, nota);
   }
   const todasOrdenadas = [...porLink.values()].sort(
     (a, b) => new Date(b.fecha) - new Date(a.fecha)
-  );
+    );
 
-  // Antes de armar el historial final, sacamos las notas que son la misma
-  // noticia repetida por distintos medios (nos quedamos con la más reciente
-  // de cada tema).
-  const todas = quitarDuplicadosPorTema(todasOrdenadas);
+// Antes de armar el historial final, sacamos las notas que son la misma
+// noticia repetida por distintos medios (nos quedamos con la más reciente
+// de cada tema).
+const todas = quitarDuplicadosPorTema(todasOrdenadas);
 
-  const nuevoHistorial = todas.slice(0, MAX_HISTORIAL);
+const nuevoHistorial = todas.slice(0, MAX_HISTORIAL);
 
-  // Si la misma imagen aparece en dos o más notas distintas, no es una foto
-  // real de ninguna de ellas: es un ícono genérico (por ejemplo, el que usa
-  // Google News en su página intermedia antes del redirect). La borramos
-  // para que esas notas usen el logo de Agro Cordobés de respaldo (ver
-  // imgOFallback en index.html). Ojo: esto NO es lo mismo que mirar el
-  // dominio de la imagen, porque Google también re-aloja fotos reales y
-  // distintas por nota bajo el mismo dominio.
-  function limpiarImagenesDuplicadas(notas) {
-    const conteo = new Map();
-    for (const n of notas) {
-      if (n.imagen) conteo.set(n.imagen, (conteo.get(n.imagen) || 0) + 1);
-    }
-    for (const n of notas) {
-      if (n.imagen && conteo.get(n.imagen) > 1) n.imagen = null;
-    }
+// Si la misma imagen aparece en dos o más notas distintas, no es una foto
+// real de ninguna de ellas: es un ícono genérico (por ejemplo, el que usa
+// Google News en su página intermedia antes del redirect). La borramos
+// para que esas notas usen el logo de Agro Cordobés de respaldo (ver
+// imgOFallback en index.html). Ojo: esto NO es lo mismo que mirar el
+// dominio de la imagen, porque Google también re-aloja fotos reales y
+// distintas por nota bajo el mismo dominio.
+function limpiarImagenesDuplicadas(notas) {
+  const conteo = new Map();
+  for (const n of notas) {
+    if (n.imagen) conteo.set(n.imagen, (conteo.get(n.imagen) || 0) + 1);
+  }
+  for (const n of notas) {
+    if (n.imagen && conteo.get(n.imagen) > 1) n.imagen = null;
+  }
+}
+
+// Primera pasada: si ya había duplicados guardados de corridas anteriores,
+// los limpiamos para volver a intentar buscarles una imagen real.
+limpiarImagenesDuplicadas(nuevoHistorial);
+
+// A las notas que quedaron sin imagen les vamos a buscar la foto de
+// portada real de la nota con microlink.io, pero no a cualquiera: solo a
+// las que son nuevas de hoy, o a las que la limpieza de arriba les acaba
+// de borrar la imagen (esas sí merecen un reintento). A una nota vieja
+// que ya viene fallando desde antes no tiene sentido insistirle todos los
+// días. Además los pedimos de a uno, con una pausa entre cada uno: el
+// plan gratis de microlink limita los pedidos por segundo, y pedirlos
+// todos en paralelo (como se hacía antes) hacía que casi todos volvieran
+// con error y sin imagen.
+const MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA = 15;
+  let busquedasHechas = 0;
+  for (const nota of nuevoHistorial) {
+    if (nota.imagen) continue;
+    if (linksYaVistos.has(nota.link)) continue; // nota vieja que ya se había intentado
+  if (busquedasHechas >= MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA) break; // cuidamos la cuota gratis
+  nota.imagen = await buscarImagenDeArticulo(nota.link);
+    busquedasHechas++;
+    await esperar(1200);
   }
 
-  // Primera pasada: si ya había duplicados guardados de corridas anteriores,
-  // los limpiamos para volver a intentar buscarles una imagen real.
-  limpiarImagenesDuplicadas(nuevoHistorial);
+// Segunda pasada: por si la búsqueda de arriba volvió a traer el mismo
+// ícono genérico para varias notas en esta misma corrida.
+limpiarImagenesDuplicadas(nuevoHistorial);
 
-  // A las notas que quedaron sin imagen, les vamos a buscar la foto de
-  // portada real de la nota.
-  await Promise.all(
-    nuevoHistorial.map(async (nota) => {
-      if (!nota.imagen) {
-        nota.imagen = await buscarImagenDeArticulo(nota.link);
-      }
-    })
-  );
+const top3 = elegirTop3(nuevoHistorial);
 
-  // Segunda pasada: por si la búsqueda de arriba volvió a traer el mismo
-  // ícono genérico para varias notas en esta misma corrida.
-  limpiarImagenesDuplicadas(nuevoHistorial);
+const salida = {
+  actualizado: new Date().toISOString(),
+  top3,
+  historial: nuevoHistorial,
+  videos,
+};
 
-  const top3 = elegirTop3(nuevoHistorial);
-
-  const salida = {
-    actualizado: new Date().toISOString(),
-    top3,
-    historial: nuevoHistorial,
-    videos,
-  };
-
-  await writeFile(DATA_PATH, JSON.stringify(salida, null, 2), "utf-8");
+await writeFile(DATA_PATH, JSON.stringify(salida, null, 2), "utf-8");
   console.log(
-    `Listo: ${nuevoHistorial.length} notas en historial, top3 con ${top3.length}, ${videos.length} videos.`
-  );
+    `Listo: ${nuevoHistorial.length} notas en historial, top3 con ${top3.length}, ${videos.length} videos. Imágenes buscadas esta corrida: ${busquedasHechas}.`
+    );
 }
 
 main().catch((err) => {
