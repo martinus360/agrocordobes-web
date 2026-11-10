@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-11-10T02:17:43.543Z",
+  "actualizado": "2026-11-10T02:24:23.890Z",
   "top3": [
     {
       "titulo": "Una multitud espera a León XIV en Córdoba para la misa en el predio de Fadea",
@@ -290,7 +290,8 @@
       "categoria": "Clima",
       "bajada": "Misa, vigilia y reuniones oficiales: así acompañará el clima los días de León XIV en Argentina&nbsp;&nbsp;",
       "fecha": "2026-11-08T17:05:48.000Z",
-      "imagen": null
+      "imagen": null,
+      "intentosImagen": 1
     },
     {
       "titulo": "Crónicas de campaña: el viento se pone de frente",
@@ -299,7 +300,8 @@
       "categoria": "Agricultura",
       "bajada": "Crónicas de campaña: el viento se pone de frente&nbsp;&nbsp;",
       "fecha": "2026-11-08T15:05:00.000Z",
-      "imagen": null
+      "imagen": "https://media.lacapital.com.ar/p/25a2af6c917c8c5b646f2edc8faa33f8/adjuntos/203/imagenes/103/514/0103514263/1200x675/smart/cronicas-campana-trigo-lluvias.png",
+      "intentosImagen": 1
     },
     {
       "titulo": "Tala RC superó a Córdoba Athletic y disputará la final con La Tablada",
@@ -308,7 +310,8 @@
       "categoria": "Agricultura",
       "bajada": "Tala RC superó a Córdoba Athletic y disputará la final con La Tablada&nbsp;&nbsp;",
       "fecha": "2026-11-08T14:05:45.000Z",
-      "imagen": null
+      "imagen": "https://srt-app.tadevel-cdn.com/hostname/www.cba24n.com.ar/api/v1/image/article/6af07d9f2aec752ba0c64120/facebook?v=391bf3ac0649d7ea7dc0d5633081ee71&s=da188f0fe9b9c0b506034b5bdb211997",
+      "intentosImagen": 1
     },
     {
       "titulo": "León XIV llega a la Argentina: el campo, la pobreza y el desafío de producir alimentos",
@@ -317,7 +320,8 @@
       "categoria": "Agricultura",
       "bajada": "León XIV llega a la Argentina: el campo, la pobreza y el desafío de producir alimentos&nbsp;&nbsp;",
       "fecha": "2026-11-08T13:49:26.000Z",
-      "imagen": null
+      "imagen": "https://www.agrolatam.com/files/image/83/83977/6af07d29d3ff9_600_315!.png?s=5082a66df1614282ed1f513d47e17f5a&d=1794106800",
+      "intentosImagen": 1
     },
     {
       "titulo": "Luis Contigiani es uno de los hombres detrás de la estrategia de expansión de la cooperativa AFA, pero no olvida para qué lo hacen: “El sentido último no es otro que el chacarero, su familia, los pueblitos&#8221;",
