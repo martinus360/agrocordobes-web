@@ -145,7 +145,7 @@
      texto alineado a la izquierda. Cada video se muestra como una tarjeta
      vertical (miniatura grande arriba, texto abajo), uno debajo del otro,
      del mismo estilo que una nota, en vez de una fila chica horizontal. */
-  .widget-videos { text-align: left; }
+  .widget-videos { text-align: left; order: 99; }
   .widget-videos-titulo {
     font-size: 11px;
     font-weight: 700;
@@ -473,7 +473,7 @@ function tarjeta(n) {
 // ajustarFilasDestacadas() de a 2 si los widgets de al lado quedan más
 // altos, para que no quede un hueco en blanco al costado.
 let cantidadDestacadas = 2;
-const MAX_DESTACADAS = 6;
+const MAX_DESTACADAS = 12;
 
 function pintarNotas() {
   if (!DATA) return;
@@ -561,7 +561,7 @@ function ajustarFilasDestacadas() {
   while (
     widgetsCol.offsetHeight > topCards.offsetHeight &&
     cantidadDestacadas < MAX_DESTACADAS &&
-    intentos < 3
+    intentos < 6
   ) {
     cantidadDestacadas += 2;
     pintarNotas();
