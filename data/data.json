@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-11-10T01:20:38.756Z",
+  "actualizado": "2026-11-10T02:17:43.543Z",
   "top3": [
     {
       "titulo": "Una multitud espera a León XIV en Córdoba para la misa en el predio de Fadea",
@@ -8,7 +8,8 @@
       "categoria": "Agricultura",
       "bajada": "Una multitud espera a León XIV en Córdoba para la misa en el predio de Fadea&nbsp;&nbsp;",
       "fecha": "2026-11-09T23:57:39.000Z",
-      "imagen": "https://media.a24.com/p/e6d56e75b6c52213b61433d57bce9690/adjuntos/296/imagenes/009/845/0009845939/1200x675/smart/leon-xiv-cordoba.jpg"
+      "imagen": "https://media.a24.com/p/e6d56e75b6c52213b61433d57bce9690/adjuntos/296/imagenes/009/845/0009845939/1200x675/smart/leon-xiv-cordoba.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Pronóstico del 10 al 12 de noviembre: tormentas aisladas y temperaturas de hasta 36 °C",
@@ -17,16 +18,18 @@
       "categoria": "Clima",
       "bajada": "Pronóstico del 10 al 12 de noviembre: tormentas aisladas y temperaturas de hasta 36 °C&nbsp;&nbsp;",
       "fecha": "2026-11-09T23:07:29.000Z",
-      "imagen": "https://ruralnet.com.ar/wp-content/uploads/2026/11/tormenta-camelina-flor-relampago-pronostico-noviembre-2026.webp"
+      "imagen": "https://ruralnet.com.ar/wp-content/uploads/2026/11/tormenta-camelina-flor-relampago-pronostico-noviembre-2026.webp",
+      "intentosImagen": 1
     },
     {
-      "titulo": "¿Se puede modificar 14 kilómetros de cauce sin pensar en las consecuencias? La agrónoma Alicia Barchuk advierte sobre las obras proyectadas sobre el río Anisacate, vital para una zona de Córdoba",
-      "link": "https://bichosdecampo.com/se-puede-modificar-14-kilometros-de-cauce-sin-pensar-en-las-consecuencias-la-agronoma-alicia-barchuk-advierte-sobre-las-obras-proyectadas-sobre-el-rio-anisacate-vital-para-una-zona-de-cordoba/",
-      "fuente": "Bichos de Campo",
-      "categoria": "Agricultura",
-      "bajada": "El río Anisacate está ubicado en la provincia de Córdoba, en el Valle de Paravachasca, y constituye uno de los sistemas hídricos más importantes de esta región.",
-      "fecha": "2026-11-09T14:06:17.000Z",
-      "imagen": "https://bichosdecampo.com/wp-content/uploads/2026/11/video-1.mp4"
+      "titulo": "Grunig: la chicharrita exige monitoreo y decisiones en cada región",
+      "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPV2sxNVZHbElTQWZJMlJVems4ZEUxV0Fwc2hrUGpDV2praExrb3I5VzR5Y01ZM0NWUGhRT0Fxa055bFp4S2NQcFdXa3YtZVRYUE9oS1ItbkF4RkF3X042cGpGWXhndkE3UEQtUXNXMHY4ZVFyamhnR2g3djlsVzhIRW52UW11WWNfMDVFTF9LNjJWUEx1cllkM0FR?oc=5",
+      "fuente": "Campo Directo",
+      "categoria": "Clima",
+      "bajada": "Grunig: la chicharrita exige monitoreo y decisiones en cada región&nbsp;&nbsp;",
+      "fecha": "2026-11-09T22:51:41.000Z",
+      "imagen": "https://campodirecto.com.ar/wp-content/uploads/2026/11/Grunig.jpeg",
+      "intentosImagen": 1
     }
   ],
   "historial": [
@@ -37,7 +40,8 @@
       "categoria": "Agricultura",
       "bajada": "Un laberinto de maíz de 10 hectáreas con un gol de Messi y Lautaro: desde el 10 de diciembre se podrá recorrer y tiene un fin solidario&nbsp;&nbsp;",
       "fecha": "2026-11-10T00:33:00.000Z",
-      "imagen": null
+      "imagen": null,
+      "intentosImagen": 1
     },
     {
       "titulo": "Una multitud espera a León XIV en Córdoba para la misa en el predio de Fadea",
@@ -46,7 +50,8 @@
       "categoria": "Agricultura",
       "bajada": "Una multitud espera a León XIV en Córdoba para la misa en el predio de Fadea&nbsp;&nbsp;",
       "fecha": "2026-11-09T23:57:39.000Z",
-      "imagen": "https://media.a24.com/p/e6d56e75b6c52213b61433d57bce9690/adjuntos/296/imagenes/009/845/0009845939/1200x675/smart/leon-xiv-cordoba.jpg"
+      "imagen": "https://media.a24.com/p/e6d56e75b6c52213b61433d57bce9690/adjuntos/296/imagenes/009/845/0009845939/1200x675/smart/leon-xiv-cordoba.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Pronóstico del 10 al 12 de noviembre: tormentas aisladas y temperaturas de hasta 36 °C",
@@ -55,7 +60,8 @@
       "categoria": "Clima",
       "bajada": "Pronóstico del 10 al 12 de noviembre: tormentas aisladas y temperaturas de hasta 36 °C&nbsp;&nbsp;",
       "fecha": "2026-11-09T23:07:29.000Z",
-      "imagen": "https://ruralnet.com.ar/wp-content/uploads/2026/11/tormenta-camelina-flor-relampago-pronostico-noviembre-2026.webp"
+      "imagen": "https://ruralnet.com.ar/wp-content/uploads/2026/11/tormenta-camelina-flor-relampago-pronostico-noviembre-2026.webp",
+      "intentosImagen": 1
     },
     {
       "titulo": "Grunig: la chicharrita exige monitoreo y decisiones en cada región",
@@ -64,7 +70,8 @@
       "categoria": "Clima",
       "bajada": "Grunig: la chicharrita exige monitoreo y decisiones en cada región&nbsp;&nbsp;",
       "fecha": "2026-11-09T22:51:41.000Z",
-      "imagen": null
+      "imagen": "https://campodirecto.com.ar/wp-content/uploads/2026/11/Grunig.jpeg",
+      "intentosImagen": 1
     },
     {
       "titulo": "León XIV recibirá en Córdoba un pedido de Abuelas de Plaza de Mayo por un nieto desaparecido en un penal administrado por monjas",
@@ -73,7 +80,8 @@
       "categoria": "Clima",
       "bajada": "León XIV recibirá en Córdoba un pedido de Abuelas de Plaza de Mayo por un nieto desaparecido en un penal administrado por monjas&nbsp;&nbsp;",
       "fecha": "2026-11-09T22:04:00.000Z",
-      "imagen": null
+      "imagen": "https://media.ambito.com/p/aa15ed8e8822287cc355f7dc05d67c84/adjuntos/239/imagenes/043/758/0043758466/1200x675/smart/alba-camargo.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Clima en Córdoba Observatorio hoy: cuál es el pronóstico del tiempo para el 10 de noviembre de 2026",
@@ -82,7 +90,8 @@
       "categoria": "Clima",
       "bajada": "Clima en Córdoba Observatorio hoy: cuál es el pronóstico del tiempo para el 10 de noviembre de 2026&nbsp;&nbsp;",
       "fecha": "2026-11-09T22:00:00.000Z",
-      "imagen": null
+      "imagen": "https://www.lanacion.com.ar/resizer/v2/el-pronostico-del-tiempo-para-cordoba-YXRN3LR5VJDXPMXDK7BUR5AAME.jpg?auth=722b6f23521e13c5ce52eacaeada2491a2c5d29da0da2a89f988fc8575001c91&width=1200&height=800&quality=70&smart=true",
+      "intentosImagen": 1
     },
     {
       "titulo": "LOS BOMBEROS LOCALES YA TIENEN ASIGNADA LA PRIMERA GUARDIA",
@@ -91,7 +100,8 @@
       "categoria": "Agricultura",
       "bajada": "LOS BOMBEROS LOCALES YA TIENEN ASIGNADA LA PRIMERA GUARDIA&nbsp;&nbsp;",
       "fecha": "2026-11-09T21:46:17.000Z",
-      "imagen": null
+      "imagen": "https://montemaizmira.com.ar/11-2026/resize_1794260685.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "¿Se puede modificar 14 kilómetros de cauce sin pensar en las consecuencias? La agrónoma Alicia Barchuk advierte sobre las obras proyectadas sobre el río Anisacate, vital para una zona de Córdoba",
@@ -100,7 +110,8 @@
       "categoria": "Agricultura",
       "bajada": "El río Anisacate está ubicado en la provincia de Córdoba, en el Valle de Paravachasca, y constituye uno de los sistemas hídricos más importantes de esta región.",
       "fecha": "2026-11-09T14:06:17.000Z",
-      "imagen": "https://bichosdecampo.com/wp-content/uploads/2026/11/video-1.mp4"
+      "imagen": "https://bichosdecampo.com/wp-content/uploads/2026/11/rio-anisacate-4.png",
+      "intentosImagen": 1
     },
     {
       "titulo": "Precio del Sorgo en Rosario hoy 9 noviembre 2026",
@@ -109,7 +120,8 @@
       "categoria": "Mercados & Cotizaciones",
       "bajada": "Precio del Sorgo en Rosario hoy 9 noviembre 2026&nbsp;&nbsp;",
       "fecha": "2026-11-09T14:05:11.000Z",
-      "imagen": null
+      "imagen": "https://www.infocampo.com.ar/wp-content/uploads/2026/04/precio-del-sorgo.webp",
+      "intentosImagen": 1
     },
     {
       "titulo": "La cumbre de Antalya promete \"resultados concretos\" ante la urgencia de la crisis climática: \"Vamos a hacer las cosas de forma diferente\"",
@@ -118,7 +130,8 @@
       "categoria": "Clima",
       "bajada": "La cumbre de Antalya promete \"resultados concretos\" ante la urgencia de la crisis climática: \"Vamos a hacer las cosas de forma diferente\"&nbsp;&nbsp;",
       "fecha": "2026-11-09T13:56:58.000Z",
-      "imagen": null
+      "imagen": "https://estaticos-cdn.prensaiberica.es/clip/64b79b91-ca38-4782-9f43-6b1fb1e622c4_16-9-discover-aspect-ratio_default_0_x1000y444.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Bioetanol en Argentina: una industria que produce más, exporta a niveles récord y busca ampliar su mercado",
@@ -127,7 +140,8 @@
       "categoria": "Mercados & Cotizaciones",
       "bajada": "Bioetanol en Argentina: una industria que produce más, exporta a niveles récord y busca ampliar su mercado&nbsp;&nbsp;",
       "fecha": "2026-11-09T13:51:18.000Z",
-      "imagen": null
+      "imagen": null,
+      "intentosImagen": 1
     },
     {
       "titulo": "Dólar blue: a cuánto cotizan hoy en Córdoba 9 noviembre 2026",
@@ -136,16 +150,8 @@
       "categoria": "Mercados & Cotizaciones",
       "bajada": "Dólar blue: a cuánto cotizan hoy en Córdoba 9 noviembre 2026&nbsp;&nbsp;",
       "fecha": "2026-11-09T13:10:07.000Z",
-      "imagen": null
-    },
-    {
-      "titulo": "\"Por el clima o por la fe, el hombre de campo vive mirando al cielo\"",
-      "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPVkZsSVkyOThiOWRNOHNIRFB0ZWpucThQTE0tQjZvNEF0bFduN3pWQXRVNUt4R0MtU2ZHVE9ITklvY3dETVdPSkRUYi05OGNaX1dlcGpKd1l1amVLNVlBdWJXSkpaSFVLQk5SZGhCbzF4Ni12OHl4VG9qbVd3dzlFRTlpSi1QRG85Z3J3TnU2c0M4blRlSDBwS3JkNEhlYnczT1pqOVpsa0xBbWd4ZlV6dDdKRmN6YktQSlNpZ1RuNA?oc=5",
-      "fuente": "Rosario3",
-      "categoria": "Clima",
-      "bajada": "\"Por el clima o por la fe, el hombre de campo vive mirando al cielo\"&nbsp;&nbsp;",
-      "fecha": "2026-11-09T13:00:55.000Z",
-      "imagen": null
+      "imagen": "https://www.infocampo.com.ar/wp-content/uploads/2025/04/dolarmep.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Algo anda mal en una de las mejores zonas agrícolas: En Río Cuarto, Eduardo Zacchi mete la pala en los lotes de maíz y encuentra &#8220;un techo&#8221; a 20 centímetros de profundidad",
@@ -154,7 +160,8 @@
       "categoria": "Agricultura",
       "bajada": "A los veinte centímetros de profundidad, las raíces del maíz se topan con una capa de suelo tan dura que les cuesta seguir bajando. Llueve y, a los pocos días, ",
       "fecha": "2026-11-09T11:31:03.000Z",
-      "imagen": null
+      "imagen": "https://bichosdecampo.com/wp-content/uploads/2026/11/EDUARDO-ZACCHI.00_07_59_00.Still003.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Doce años de riego subterráneo: qué cambios encontró el INTA en los suelos de Córdoba",
@@ -163,7 +170,8 @@
       "categoria": "Agricultura",
       "bajada": "Doce años de riego subterráneo: qué cambios encontró el INTA en los suelos de Córdoba&nbsp;&nbsp;",
       "fecha": "2026-11-09T11:00:00.000Z",
-      "imagen": null
+      "imagen": "https://www.revistachacra.com.ar/files/image/66/66822/6aedc715c633e_600_315!.jpg?s=a34309f8b4910376ba0511284319b045&d=1793934000",
+      "intentosImagen": 1
     },
     {
       "titulo": "Súper Niño: miles de hectáreas fueron alcanzadas por violentas tormentas y hay cultivos “barridos por completo”",
@@ -172,7 +180,8 @@
       "categoria": "Clima",
       "bajada": "Súper Niño: miles de hectáreas fueron alcanzadas por violentas tormentas y hay cultivos “barridos por completo”&nbsp;&nbsp;",
       "fecha": "2026-11-09T09:06:03.000Z",
-      "imagen": null
+      "imagen": "https://despertarentrerriano.com/wp-content/uploads/2026/11/con-las-ultimas-tormentas-se-registraron-trigos-JOLM4YTO2RDSTOBD2TXGJ7SHSE.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Lluvias y alerta en el campo: el Niño ya se instaló",
@@ -181,7 +190,18 @@
       "categoria": "Clima",
       "bajada": "Lluvias y alerta en el campo: el Niño ya se instaló&nbsp;&nbsp;",
       "fecha": "2026-11-09T09:03:51.000Z",
-      "imagen": null
+      "imagen": "https://www.identidadcorrentina.com.ar/multimedia/imagenes/fotos/2026-11-09/513931_mediana.jpg",
+      "intentosImagen": 1
+    },
+    {
+      "titulo": "\"Por el clima o por la fe, el hombre de campo vive mirando al cielo\"",
+      "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPVkZsSVkyOThiOWRNOHNIRFB0ZWpucThQTE0tQjZvNEF0bFduN3pWQXRVNUt4R0MtU2ZHVE9ITklvY3dETVdPSkRUYi05OGNaX1dlcGpKd1l1amVLNVlBdWJXSkpaSFVLQk5SZGhCbzF4Ni12OHl4VG9qbVd3dzlFRTlpSi1QRG85Z3J3TnU2c0M4blRlSDBwS3JkNEhlYnczT1pqOVpsa0xBbWd4ZlV6dDdKRmN6YktQSlNpZ1RuNA?oc=5",
+      "fuente": "Rosario3",
+      "categoria": "Clima",
+      "bajada": "\"Por el clima o por la fe, el hombre de campo vive mirando al cielo\"&nbsp;&nbsp;",
+      "fecha": "2026-11-09T07:36:51.000Z",
+      "imagen": "https://www.rosario3.com/__export/1794232246574/sites/rosario3/img/2026/11/09/captura_de_pantalla_2026-11-09_104952_crop1794232245776.png_673822677.png",
+      "intentosImagen": 1
     },
     {
       "titulo": "Clima en Córdoba: cómo estará el tiempo este lunes 9 de noviembre",
@@ -190,7 +210,8 @@
       "categoria": "Clima",
       "bajada": "Clima en Córdoba: cómo estará el tiempo este lunes 9 de noviembre&nbsp;&nbsp;",
       "fecha": "2026-11-09T03:23:13.000Z",
-      "imagen": null
+      "imagen": "https://images-tools.cadena3.com/tools/r/f328a780-7843-4f95-8325-79aa5ef54c31.jpg?width=1200&height=800",
+      "intentosImagen": 1
     },
     {
       "titulo": "Cómo estará el clima en Córdoba durante la vigilia y la visita de León XIV",
@@ -199,7 +220,8 @@
       "categoria": "Clima",
       "bajada": "Cómo estará el clima en Córdoba durante la vigilia y la visita de León XIV&nbsp;&nbsp;",
       "fecha": "2026-11-09T02:23:08.000Z",
-      "imagen": null
+      "imagen": "https://images-tools.cadena3.com/tools/r/fcd914f5-ee99-4f2f-851c-a9af43604da4.jpg?width=1200&height=581",
+      "intentosImagen": 1
     },
     {
       "titulo": "\"La Joya Agro\": seis años de \"crear contenido\" agropecuario y el impacto de sus historias en redes",
@@ -208,7 +230,8 @@
       "categoria": "Agricultura",
       "bajada": "\"La Joya Agro\": seis años de \"crear contenido\" agropecuario y el impacto de sus historias en redes&nbsp;&nbsp;",
       "fecha": "2026-11-08T22:07:17.000Z",
-      "imagen": null
+      "imagen": "https://www.agrositio.com.ar/imagenesweb/agrotv/A-hls_1243-d9fb3557b45b9ec544b3942f.webp",
+      "intentosImagen": 1
     },
     {
       "titulo": "MONTE MAÍZ PRESENTE EN LA VIGILIA DEL PAPA LEÓN XIV",
@@ -217,7 +240,8 @@
       "categoria": "Agricultura",
       "bajada": "MONTE MAÍZ PRESENTE EN LA VIGILIA DEL PAPA LEÓN XIV&nbsp;&nbsp;",
       "fecha": "2026-11-08T21:18:46.000Z",
-      "imagen": null
+      "imagen": "https://montemaizmira.com.ar/11-2026/resize_1794172511.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Las «pymes» del biodiésel: Un relato épico que no se corresponde con la realidad de los hechos",
@@ -226,7 +250,8 @@
       "categoria": "Agricultura",
       "bajada": "En los últimos años, los debates legislativos sobre biocombustibles han estado caracterizados por un hecho recurrente: la defensa del status quo para evitar per",
       "fecha": "2026-11-08T20:40:47.000Z",
-      "imagen": null
+      "imagen": "https://bichosdecampo.com/wp-content/uploads/2024/09/unitec-bio-3.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "El papa León XIV llegó a la Argentina y comenzó una histórica visita de cuatro días",
@@ -235,7 +260,8 @@
       "categoria": "Agricultura",
       "bajada": "El papa León XIV llegó a la Argentina y comenzó una histórica visita de cuatro días&nbsp;&nbsp;",
       "fecha": "2026-11-08T19:43:41.000Z",
-      "imagen": null
+      "imagen": null,
+      "intentosImagen": 1
     },
     {
       "titulo": "\"Es inaceptable\": Luca Regiardo pidió disculpas por el festejo de Newell's tras el título de Boca",
@@ -244,7 +270,8 @@
       "categoria": "Agricultura",
       "bajada": "\"Es inaceptable\": Luca Regiardo pidió disculpas por el festejo de Newell's tras el título de Boca&nbsp;&nbsp;",
       "fecha": "2026-11-08T19:22:00.000Z",
-      "imagen": null
+      "imagen": "https://media.lacapital.com.ar/p/a220e01c0662466d096fe828fe9c461e/adjuntos/203/imagenes/103/518/0103518686/regiardo.jpg",
+      "intentosImagen": 1
     },
     {
       "titulo": "Se vienen varios días con tiempo ideal para avanzar con las labores agrícolas en la región central argentina",
@@ -253,7 +280,8 @@
       "categoria": "Agricultura",
       "bajada": "Se vienen varios días con tiempo ideal para avanzar con las labores agrícolas en la región central argentina&nbsp;&nbsp;",
       "fecha": "2026-11-08T19:13:15.000Z",
-      "imagen": null
+      "imagen": "https://bichosdecampo.com/wp-content/uploads/2023/03/Siembra.png",
+      "intentosImagen": 1
     },
     {
       "titulo": "Misa, vigilia y reuniones oficiales: así acompañará el clima los días de León XIV en Argentina",
