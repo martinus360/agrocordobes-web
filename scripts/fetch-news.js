@@ -168,13 +168,13 @@ const pubDateRaw =
 
 // Imagen: probamos media:content, enclosure, o una <img> dentro de description
 let imagen =
-  extraerAtributo(itemXml, "media:content", "url") ||
-  extraerAtributo(itemXml, "enclosure", "url");
+  imagenUtil(extraerAtributo(itemXml, "media:content", "url")) ||
+  imagenUtil(extraerAtributo(itemXml, "enclosure", "url"));
 
 if (!imagen) {
   const desc = extraerTag(itemXml, "description") || "";
   const imgMatch = desc.match(/<img[^>]+src=["']([^"']+)["']/i);
-  if (imgMatch) imagen = imgMatch[1];
+  if (imgMatch) imagen = imagenUtil(imgMatch[1]);
 }
 
 return {
@@ -250,17 +250,107 @@ function quitarDuplicadosPorTema(notas) {
   return resultado;
 }
 
-async function buscarImagenDeArticulo(url) {
+async function buscarImagenMicrolink(url) {
   try {
     const apiUrl =
       "https://api.microlink.io?url=" + encodeURIComponent(url) + "&meta=true";
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(12000) });
     if (!res.ok) return null;
     const data = await res.json();
-    return data?.data?.image?.url || null;
+    return imagenUtil(data?.data?.image?.url);
   } catch {
     return null;
   }
+}
+
+// --- Imágenes: resolver el link real detrás de Google News y leer su og:image ---
+const UA_NAVEGADOR = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
+// Descarta URLs que no sirven como foto (videos .mp4, links raros, etc.).
+function imagenUtil(url) {
+  if (!url || typeof url !== "string") return null;
+  const u = url.trim();
+  if (!/^https?:\/\//i.test(u)) return null;
+  if (/\.(mp4|webm|mov|m3u8|avi)(\?|$)/i.test(u)) return null;
+  return u;
+}
+
+// Los links de Google News son redirects por JS: para llegar a la nota real
+// hay que pedirle a Google que los "decodifique" (misma llamada que hace su web).
+async function resolverLinkGoogleNews(link) {
+  try {
+    const u = new URL(link);
+    if (u.hostname !== "news.google.com") return link;
+    const m = u.pathname.match(/\/(?:rss\/)?articles\/([^/?]+)/);
+    if (!m) return null;
+    const id = m[1];
+    const res = await fetch("https://news.google.com/rss/articles/" + id, {
+      headers: { "User-Agent": UA_NAVEGADOR },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const sg = html.match(/data-n-a-sg="([^"]+)"/);
+    const ts = html.match(/data-n-a-ts="([^"]+)"/);
+    if (!sg || !ts) return null;
+    const inner = JSON.stringify(["garturlreq", [["X", "X", ["X", "X"], null, null, 1, 1, "US:en", null, 1, null, null, null, null, null, 0, 1], "X", "X", 1, [1, 1, 1], 1, 1, null, 0, 0, null, 0], id, Number(ts[1]), sg[1]]);
+    const body = "f.req=" + encodeURIComponent(JSON.stringify([[["Fbv4je", inner, null, "generic"]]]));
+    const r2 = await fetch("https://news.google.com/_/DotsSplashUi/data/batchexecute", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8", "User-Agent": UA_NAVEGADOR },
+      body,
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!r2.ok) return null;
+    const txt = await r2.text();
+    const linea = txt.split("\n").find((l) => l.indexOf("wrb.fr") !== -1);
+    if (!linea) return null;
+    const fila = JSON.parse(linea).find((x) => x && x[1] === "Fbv4je");
+    if (!fila || !fila[2]) return null;
+    const real = JSON.parse(fila[2])[1];
+    return typeof real === "string" && /^https?:\/\//i.test(real) ? real : null;
+  } catch (err) {
+    console.warn("No se pudo resolver el link de Google News: " + err.message);
+    return null;
+  }
+}
+
+// Lee la foto principal (og:image / twitter:image) directo de la nota real.
+async function imagenDesdePagina(url) {
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": UA_NAVEGADOR, Accept: "text/html,*/*", "Accept-Language": "es-AR,es;q=0.9" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) return null;
+    const html = (await res.text()).slice(0, 300000);
+    const patrones = [
+      /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]*content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]*property=["']og:image["']/i,
+      /<meta[^>]+name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i,
+    ];
+    for (const re of patrones) {
+      const m = html.match(re);
+      if (!m) continue;
+      try {
+        const abs = imagenUtil(new URL(m[1].replace(/&amp;/g, "&"), res.url).href);
+        if (abs) return abs;
+      } catch {}
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function buscarImagenDeArticulo(url) {
+  const real = await resolverLinkGoogleNews(url);
+  if (!real) return null;
+  const directa = await imagenDesdePagina(real);
+  if (directa) return directa;
+  return await buscarImagenMicrolink(real);
 }
 
 function esperar(ms) {
@@ -360,6 +450,7 @@ let historial = [];
     historial = (previo.historial || []).map((n) => ({
       ...n,
       categoria: migrarCategoriaVieja(n.categoria),
+      imagen: imagenUtil(n.imagen),
     }));
     videosPrevios = previo.videos || [];
   } catch {
@@ -411,13 +502,14 @@ limpiarImagenesDuplicadas(nuevoHistorial);
 // los días. Además los pedimos de a uno, con pausa entre cada uno: el
 // plan gratis de microlink limita los pedidos por segundo, y pedirlos
 // todos en paralelo hacía que casi todos volvieran con error.
-const MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA = 15;
+const MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA = 25;
   let busquedasHechas = 0;
   for (const nota of nuevoHistorial) {
     if (nota.imagen) continue;
-    if (linksYaVistos.has(nota.link)) continue;
+    if ((nota.intentosImagen || 0) >= 3) continue;
     if (busquedasHechas >= MAX_BUSQUEDAS_IMAGEN_POR_CORRIDA) break;
     nota.imagen = await buscarImagenDeArticulo(nota.link);
+    nota.intentosImagen = (nota.intentosImagen || 0) + 1;
     busquedasHechas++;
     await esperar(1200);
   }
