@@ -1,6 +1,6 @@
 {
-    "_instrucciones": "Poné 1 o 2 banners publicitarios. Si hay 2, rotan solos cada 8 segundos (empezando en uno al azar, no siempre en el primero). Cambiá esto una vez por mes, nada más.",
-    "elementos": [
-          { "imagen": "assets/autopista-r19_cba-sf_tramo-nuevo_1140x200px.gif", "link": "https://youtu.be/uw6YQymicb0", "alt": "Autopista Córdoba - San Francisco" }
-    ]
+  "_instrucciones": "Poné 1 o 2 banners publicitarios. Si hay 2, rotan solos cada 8 segundos (empezando en uno al azar, no siempre en el primero). Cambiá esto una vez por mes, nada más.",
+  "elementos": [
+    { "imagen": "assets/banner_presupuesto2027.gif", "link": "https://www.youtube.com/watch?v=olnTXDDu2Vc", "alt": "Presupuesto 2027: los cordobeses no bajamos los brazos, bajamos los impuestos" }
+  ]
 }
